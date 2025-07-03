@@ -1,0 +1,19 @@
+export const PUBLIC_ROUTES = {
+	home: '/',
+	login: '/login',
+	register: '/register'
+}
+
+export const PROTECTED_ROUTES = {
+	create: '/create',
+	profile: '/profile/:username',
+	settings: '/settings'
+}
+
+export const PUBLIC_ROUTES_VALUES = Object.values(PUBLIC_ROUTES)
+export const PROTECTED_ROUTES_VALUES = Object.values(PROTECTED_ROUTES)
+
+export const ROUTES = {
+	...PUBLIC_ROUTES,
+	...PROTECTED_ROUTES
+}
