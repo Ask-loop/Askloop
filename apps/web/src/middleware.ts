@@ -1,28 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ROUTES, PUBLIC_ROUTES_VALUES } from './constants'
+import { Cookies } from './constants/cookies'
 
-export function middleware(request: NextRequest) {
-	const { pathname } = request.nextUrl
+export default function middleware(request: NextRequest) {
+	const { nextUrl, cookies } = request
+	const accessToken = cookies.get(Cookies.USER)?.value
+	const url = nextUrl.clone()
 
-	const accessToken = request.cookies.get('user')?.value
-	const url = request.nextUrl.clone()
-	const isPublicRoute = PUBLIC_ROUTES_VALUES.some(route =>
-		pathname.startsWith(route)
+	const isPublicPage = PUBLIC_ROUTES_VALUES.some(
+		path => url.pathname === path || url.pathname.startsWith(`${path}/`)
 	)
 
-	if (!accessToken && !isPublicRoute) {
-		url.pathname = ROUTES.signIn
+	// if (!accessToken && !isPublicPage) {
+	// 	url.pathname = ROUTES.signIn
 
-		return NextResponse.redirect(url)
-	} else if (accessToken && isPublicRoute) {
-		url.pathname = ROUTES.home
+	// 	return NextResponse.redirect(url)
+	// } else if (accessToken && isPublicPage) {
+	// 	url.pathname = ROUTES.home
 
-		return NextResponse.redirect(url)
-	}
+	// 	return NextResponse.redirect(url)
+	// }
 
 	return NextResponse.next()
 }
 
 export const config = {
-	matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)']
+	matcher: [
+		'/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)'
+	]
 }
