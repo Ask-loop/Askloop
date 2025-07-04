@@ -15,19 +15,23 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/shared/shadcn/ui/select'
+import { cn } from '../lib/utils'
 
-export type RHFSelectProps = {
+export type RHFSelectProps = React.ComponentProps<typeof Select> & {
 	name: string
 	label?: string
 	options: { label: string; value: string }[]
 	placeholder?: string
+	className?: string
 }
 
 export const RHFSelect = ({
 	name,
 	label,
 	options,
-	placeholder
+	placeholder,
+	className,
+	...props
 }: RHFSelectProps) => {
 	const { control } = useFormContext()
 
@@ -36,13 +40,14 @@ export const RHFSelect = ({
 			name={name}
 			control={control}
 			render={({ field }) => (
-				<FormItem>
+				<FormItem className={cn('w-full', className)}>
 					{label && <FormLabel>{label}</FormLabel>}
 					<FormControl>
 						<Select
 							onValueChange={field.onChange}
 							defaultValue={field.value}
 							value={field.value}
+							{...props}
 						>
 							<SelectTrigger>
 								<SelectValue

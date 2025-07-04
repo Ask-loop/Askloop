@@ -1,4 +1,5 @@
-import { HomeIcon, TagIcon } from 'lucide-react'
+import { HomeIcon, ListIcon, TagIcon, UsersIcon } from 'lucide-react'
+import { ROUTES } from '@/constants'
 
 export const sidebarVariants = {
 	open: { width: 256 },
@@ -9,11 +10,21 @@ export const menuItems = [
 	{
 		title: 'Home',
 		icon: <HomeIcon />,
-		href: '/'
+		href: ROUTES.home
+	},
+	{
+		title: 'All Questions',
+		icon: <ListIcon />,
+		href: ROUTES.questions
 	},
 	{
 		title: 'Tags',
 		icon: <TagIcon />,
-		href: '/tags'
+		href: ROUTES.tags
+	},
+	{
+		title: 'Users',
+		icon: <UsersIcon />,
+		href: ROUTES.users
 	}
 ]

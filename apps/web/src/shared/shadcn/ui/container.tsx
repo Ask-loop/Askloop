@@ -9,7 +9,7 @@ export const Container = ({
 	className?: string
 }) => {
 	return (
-		<div className={cn('container mx-auto px-4', className)}>
+		<div className={cn('container px-4 mx-auto', className)}>
 			{children}
 		</div>
 	)
