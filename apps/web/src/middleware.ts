@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
 	)
 
 	if (!accessToken && !isPublicRoute) {
-		url.pathname = ROUTES.login
+		url.pathname = ROUTES.signIn
 
 		return NextResponse.redirect(url)
 	} else if (accessToken && isPublicRoute) {

@@ -1,16 +1,10 @@
-import { BellIcon, MessageCircleIcon, PlusIcon, SearchIcon } from 'lucide-react'
+import { BellIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/shadcn/ui/avatar'
 import { Button } from '@/shared/shadcn/ui/button'
 import { Input } from '@/shared/shadcn/ui/input'
+import { AskLoopLogo } from '@/shared/ui/Logo'
 import { ROUTES } from '@/constants/routes'
-
-export const AskLoopLogo = () => (
-	<Link href={ROUTES.home} className='flex items-center gap-2'>
-		<MessageCircleIcon className='h-5 w-5' />
-		<span className='text-base font-bold'>AskLoop</span>
-	</Link>
-)
 
 export const Header = () => {
 	const isAuthenticated = false
@@ -64,13 +58,13 @@ export const Header = () => {
 						</>
 					) : (
 						<>
-							<Link href={ROUTES.login}>
+							<Link href={ROUTES.signIn}>
 								<Button variant='ghost'>
 									<span>Sign in</span>
 								</Button>
 							</Link>
 
-							<Link href={ROUTES.register}>
+							<Link href={ROUTES.signUp}>
 								<Button asChild variant='default'>
 									<span>Sign up</span>
 								</Button>

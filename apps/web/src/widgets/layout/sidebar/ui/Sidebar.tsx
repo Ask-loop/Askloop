@@ -4,9 +4,10 @@ import { motion } from 'framer-motion'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/shadcn/ui/button'
-import { useSidebarStore } from '../../model'
+import { menuItems } from '../config'
+import { sidebarVariants } from '../config'
+import { useSidebarStore } from '../model'
 import { NavLink } from './NavLink'
-import { menuItems, sidebarVariants } from './constants'
 
 export const Sidebar = () => {
 	const { collapsed, toggle } = useSidebarStore()

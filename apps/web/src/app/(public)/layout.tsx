@@ -1,4 +1,4 @@
-import { Layout } from '@/processes/Layout/Layout'
+import { Layout } from '@/widgets/layout'
 
 export default function PublicLayout({
 	children
