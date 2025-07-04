@@ -1,7 +1,7 @@
 import { Container } from '@/shared/shadcn/ui/container'
-import { Footer } from './ui/footer'
-import { Header } from './ui/header'
-import { Sidebar } from './ui/sidebar'
+import { Footer } from './footer/ui'
+import { Header } from './header/ui'
+import { Sidebar } from './sidebar/ui'
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
 	return (
