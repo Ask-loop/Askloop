@@ -18,7 +18,7 @@ export const useAuthStore = create<AuthStore>()(
 			signOut: () => set({ user: null, isAuthenticated: false })
 		}),
 		{
-			name: 'auth',
+			name: 'authStore',
 			partialize: state => ({
 				user: state.user,
 				isAuthenticated: state.isAuthenticated
