@@ -9,7 +9,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 			<Header />
 			<div className='flex h-full flex-1'>
 				<Sidebar />
-				<Container className='flex-1'>{children}</Container>
+				<Container className='flex-1 py-10'>{children}</Container>
 			</div>
 			<Footer />
 		</main>

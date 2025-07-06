@@ -2,22 +2,25 @@
 
 import { useFormContext } from 'react-hook-form'
 import { Input } from '@/shared/shadcn/ui/input'
+import { cn } from '../lib/utils'
 import {
 	FormControl,
 	FormField,
 	FormItem,
 	FormLabel,
-	FormMessage
+	FormMessage,
+	FormDescription
 } from '../shadcn/ui/form'
 
 export type RHFInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
 	name: string
 	className?: string
 	label?: string
+	description?: string
 }
 
 export const RHFInput = (props: RHFInputProps) => {
-	const { name, label, className, ...restOfProps } = props
+	const { name, label, className, description, ...restOfProps } = props
 
 	const { control } = useFormContext()
 
@@ -28,9 +31,14 @@ export const RHFInput = (props: RHFInputProps) => {
 			render={({
 				field: { ref, value, onChange, ...restOfFieldProps }
 			}) => (
-				<FormItem>
+				<FormItem className={cn('w-full', className)}>
 					{label && <FormLabel>{label}</FormLabel>}
-					<FormControl>
+					{description && (
+						<FormDescription {...restOfFieldProps} {...restOfProps}>
+							{description}
+						</FormDescription>
+					)}
+					<FormControl className='rounded-md'>
 						<Input
 							value={value}
 							ref={ref}

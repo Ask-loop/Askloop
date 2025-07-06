@@ -12,6 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import { User } from '@modules/users/entities/user.entity';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
+import { IApiResponse } from '@common/interfaces/response.interface';
 
 @ApiBearerAuth('JWT-auth')
 @ApiTags('Auth')
@@ -82,25 +83,33 @@ export class AuthController {
 
   @Get('oauth/connect/google')
   @UseGuards(GoogleOAuthGuard)
-  async connectOauthGoogle() {
-    return this.authService.connectOauth(AuthenticationMethod.GOOGLE);
-  }
+  async connectOauthGoogle() {}
 
   @Get('oauth/connect/github')
   @UseGuards(GithubOAuthGuard)
-  async connectOauthGithub() {
-    return this.authService.connectOauth(AuthenticationMethod.GITHUB);
-  }
+  async connectOauthGithub() {}
 
   @Get('oauth/callback/google')
   @UseGuards(GoogleOAuthGuard)
-  async oauthCallbackGoogle(@Res() res: Response) {
-    return res.redirect(this.configService.getOrThrow<string>('ALLOWED_ORIGIN'));
+  async oauthCallbackGoogle(@Req() req: Request & { user: { data: SignInResponse } }, @Res() res: Response) {
+    const { accessToken, refreshToken, user } = req?.user?.data;
+
+    const redirectUrl = this.configService.getOrThrow<string>('ALLOWED_ORIGIN');
+
+    const encodedUser = encodeURIComponent(JSON.stringify(user));
+
+    return res.redirect(`${redirectUrl}/oauth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&user=${encodedUser}`);
   }
 
   @Get('oauth/callback/github')
   @UseGuards(GithubOAuthGuard)
-  async oauthCallbackGithub(@Res() res: Response) {
-    return res.redirect(this.configService.getOrThrow<string>('ALLOWED_ORIGIN'));
+  async oauthCallbackGithub(@Req() req: Request & { user: { data: SignInResponse } }, @Res() res: Response) {
+    const { accessToken, refreshToken, user } = req?.user?.data;
+
+    const redirectUrl = this.configService.getOrThrow<string>('ALLOWED_ORIGIN');
+
+    const encodedUser = encodeURIComponent(JSON.stringify(user));
+
+    return res.redirect(`${redirectUrl}/oauth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&user=${encodedUser}`);
   }
 }

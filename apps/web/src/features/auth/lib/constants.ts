@@ -8,6 +8,6 @@ export const enum AuthEndpoints {
 	SignOut = '/auth/sign-out',
 	RefreshTokens = '/auth/refresh-tokens',
 	DeleteAccount = '/auth/delete-account',
-	ConnectOauth = '/auth/connect-oauth',
-	OauthSignIn = '/auth/oauth-sign-in'
+	ConnectOauth = '/auth/oauth/connect',
+	GetUser = '/users/me'
 }

@@ -12,6 +12,7 @@
     "prepare": "husky",
     "format": "prettier --write ."
   },
+  "packageManager": "npm@10.9.0",
   "keywords": [],
   "author": "",
   "license": "ISC",

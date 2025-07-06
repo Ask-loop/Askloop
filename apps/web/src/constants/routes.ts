@@ -2,13 +2,17 @@ export const PUBLIC_ROUTES = {
 	home: '/',
 	signIn: '/sign-in',
 	signUp: '/sign-up',
-	forgotPassword: '/forgot-password'
+	resetPassword: '/reset-password',
+	questions: '/questions',
+	tags: '/tags',
+	users: '/users'
 }
 
 export const PROTECTED_ROUTES = {
 	create: '/create',
 	profile: '/profile/:username',
-	settings: '/settings'
+	settings: '/settings',
+	ask: '/ask'
 }
 
 export const PUBLIC_ROUTES_VALUES = Object.values(PUBLIC_ROUTES)

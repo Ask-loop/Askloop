@@ -12,3 +12,8 @@ export type AuthResponse = Tokens & {
 export type VerifyEmailReq = {
 	verificationToken: string
 }
+
+export type ResetPasswordReq = {
+	newPassword: string
+	token: string
+}

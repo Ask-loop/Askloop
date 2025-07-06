@@ -8,7 +8,7 @@ export class AccountsService {
   constructor() {}
 
   async findByProvider(provider: AuthenticationMethod, providerAccountId: string) {
-    return Account.findOne({ where: { provider, providerAccountId } });
+    return Account.findOne({ where: { provider, providerAccountId }, relations: ['user'] });
   }
 
   async createOAuthUser(provider: AuthenticationMethod, providerAccountId: string, user: User) {

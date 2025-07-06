@@ -4,9 +4,9 @@ import { User } from '@/shared/types'
 
 type AuthStore = {
 	user: User | null
-	setUser: (user: User) => void
-	signOut: () => void
 	isAuthenticated: boolean
+	setUser: (user: User) => void
+	signOut: VoidFunction
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -19,7 +19,10 @@ export const useAuthStore = create<AuthStore>()(
 		}),
 		{
 			name: 'auth',
-			partialize: state => ({ user: state.user })
+			partialize: state => ({
+				user: state.user,
+				isAuthenticated: state.isAuthenticated
+			})
 		}
 	)
 )

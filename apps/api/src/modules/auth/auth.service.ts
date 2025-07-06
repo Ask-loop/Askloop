@@ -191,10 +191,10 @@ export class AuthService {
   // --- OAUTH METHODS --- //
 
   async oauthSignIn(profile: OauthProfile) {
-    const existingAccount = await this.accountsService.findByProvider(profile.provider, profile.providerId);
+    const existingAccount = await this.accountsService.findByProvider(profile.provider, profile?.providerId);
 
     if (existingAccount) {
-      const user = await this.usersService.findById(existingAccount.user.id);
+      const user = await this.usersService.findById(existingAccount?.user?.id);
 
       if (!user) throw new UnauthorizedException('User not found');
 

@@ -7,19 +7,13 @@ export function middleware(request: NextRequest) {
 
 	const accessToken = request.cookies.get(Cookies.USER)?.value
 
-	console.log(accessToken?.accessToken)
-
 	const url = request.nextUrl.clone()
-	const isPublicRoute = PUBLIC_ROUTES_VALUES.some(route =>
+	const isPublicPage = PUBLIC_ROUTES_VALUES.some(route =>
 		pathname.startsWith(route)
 	)
 
-	if (!accessToken && !isPublicRoute) {
+	if (!accessToken && !isPublicPage) {
 		url.pathname = ROUTES.signIn
-
-		return NextResponse.redirect(url)
-	} else if (accessToken && isPublicRoute) {
-		url.pathname = ROUTES.home
 
 		return NextResponse.redirect(url)
 	}
@@ -28,5 +22,7 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-	matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)']
+	matcher: [
+		'/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)'
+	]
 }

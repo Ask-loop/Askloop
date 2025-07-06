@@ -20,9 +20,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy, AuthenticationMet
   }
 
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
+    console.log(profile);
     const user: OauthProfile = {
       email: profile.emails?.[0]?.value ?? '',
-      name: profile.name?.givenName ?? '',
+      name: profile.displayName ?? '',
       avatar: profile.photos?.[0]?.value ?? '',
       provider: AuthenticationMethod.GOOGLE,
       providerId: profile.id,

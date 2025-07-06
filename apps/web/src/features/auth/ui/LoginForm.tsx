@@ -1,7 +1,8 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowRight, Link } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import {
 	FormProvider,
@@ -72,7 +73,7 @@ export const LoginForm = () => {
 						className='text-primary hover:text-primary/80 text-sm'
 						asChild
 					>
-						<Link href={ROUTES.forgotPassword}>
+						<Link href={ROUTES.resetPassword}>
 							Forgot password?
 						</Link>
 					</Button>

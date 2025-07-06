@@ -35,13 +35,15 @@ export const Header = () => {
 				<div className='flex items-center gap-2'>
 					{isAuthenticated ? (
 						<>
-							<Button
-								variant='outline'
-								className='hidden rounded-full sm:inline-flex'
-							>
-								<PlusIcon className='mr-1 h-4 w-4' />
-								<span>Ask Question</span>
-							</Button>
+							<Link href={ROUTES.ask}>
+								<Button
+									variant='outline'
+									className='hidden rounded-full sm:inline-flex'
+								>
+									<PlusIcon className='mr-1 h-4 w-4' />
+									<span>Ask Question</span>
+								</Button>
+							</Link>
 
 							<Button
 								variant='ghost'
@@ -64,8 +66,8 @@ export const Header = () => {
 										/>
 									)}
 									<AvatarFallback>
-										{user?.firstName.charAt(0) || 'U'}
-										{user?.lastName.charAt(0) || 'U'}
+										{user?.firstName?.charAt(0) || 'U'}
+										{user?.lastName?.charAt(0) || 'U'}
 									</AvatarFallback>
 								</Avatar>
 							</Button>
