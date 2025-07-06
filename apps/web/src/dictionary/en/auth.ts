@@ -10,5 +10,9 @@ export const authDictionary = {
 		alreadyHaveAccount: 'Already have an account?'
 	},
 	signUp: 'Sign up',
-	signIn: 'Sign in'
+	signIn: 'Sign in',
+	verifyEmail: {
+		title: 'Verify Email',
+		description: 'Verify your email to continue'
+	}
 }

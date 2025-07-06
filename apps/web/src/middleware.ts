@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ROUTES, PUBLIC_ROUTES_VALUES } from './constants'
+import { Cookies } from './constants/cookies'
 
 export function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl
 
-	const accessToken = request.cookies.get('user')?.value
+	const accessToken = request.cookies.get(Cookies.USER)?.value
+
+	console.log(accessToken?.accessToken)
+
 	const url = request.nextUrl.clone()
 	const isPublicRoute = PUBLIC_ROUTES_VALUES.some(route =>
 		pathname.startsWith(route)

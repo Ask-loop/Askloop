@@ -1,5 +1,9 @@
+'use client'
+
 import { BellIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import Link from 'next/link'
+import { useShallow } from 'zustand/react/shallow'
+import { useAuthStore } from '@/features/auth/model/auth.store'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/shadcn/ui/avatar'
 import { Button } from '@/shared/shadcn/ui/button'
 import { Input } from '@/shared/shadcn/ui/input'
@@ -7,7 +11,12 @@ import { AskLoopLogo } from '@/shared/ui/Logo'
 import { ROUTES } from '@/constants/routes'
 
 export const Header = () => {
-	const isAuthenticated = false
+	const { isAuthenticated, user } = useAuthStore(
+		useShallow(state => ({
+			isAuthenticated: state.isAuthenticated,
+			user: state.user
+		}))
+	)
 
 	return (
 		<header className='bg-background sticky top-0 z-10 h-16 border-b px-4 py-2'>
@@ -48,11 +57,16 @@ export const Header = () => {
 								aria-label='User menu'
 							>
 								<Avatar className='h-8 w-8'>
-									<AvatarImage
-										src='https://github.com/shadcn.png'
-										alt='@user'
-									/>
-									<AvatarFallback>U</AvatarFallback>
+									{user?.picture && (
+										<AvatarImage
+											src={user?.picture}
+											alt='@user'
+										/>
+									)}
+									<AvatarFallback>
+										{user?.firstName.charAt(0) || 'U'}
+										{user?.lastName.charAt(0) || 'U'}
+									</AvatarFallback>
 								</Avatar>
 							</Button>
 						</>

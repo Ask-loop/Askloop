@@ -5,7 +5,7 @@ import axios, {
 	AxiosResponse,
 	InternalAxiosRequestConfig
 } from 'axios'
-import { clearCookie, getUserCookie } from '@/features/auth/lib'
+import { clearAuthCookie, getAuthCookie } from '@/features/auth/lib/cookie'
 import { ROUTES } from '@/constants'
 
 class Instance {
@@ -28,7 +28,7 @@ class Instance {
 	}
 
 	private async handleRequest(config: InternalAxiosRequestConfig) {
-		const tokens = await getUserCookie()
+		const tokens = await getAuthCookie()
 		const accessToken = tokens?.accessToken
 
 		if (accessToken) {
@@ -44,42 +44,51 @@ class Instance {
 
 	private handleError(error: AxiosError) {
 		if (error.response?.status === 401) {
-			clearCookie()
+			clearAuthCookie()
 
 			if (typeof window !== 'undefined') {
 				window.location.replace(ROUTES.signIn)
 			}
 		}
+		return Promise.reject(error)
 	}
 
 	async get<T>(url: string, config?: AxiosRequestConfig) {
-		const response = await this.instance.get<T>(url, config)
+		const { data: response } = await this.instance.get<T>(url, config)
 
-		return response.data
+		return response
 	}
 
 	async post<T>(url: string, data?: any, config?: AxiosRequestConfig) {
-		const response = await this.instance.post<T>(url, data, config)
+		const { data: response } = await this.instance.post<T>(
+			url,
+			data,
+			config
+		)
 
-		return response.data
+		return response
 	}
 
 	async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig) {
-		const response = await this.instance.put<T>(url, data, config)
+		const { data: response } = await this.instance.put<T>(url, data, config)
 
-		return response.data
+		return response
 	}
 
 	async delete<T>(url: string, config?: AxiosRequestConfig) {
-		const response = await this.instance.delete<T>(url, config)
+		const { data: response } = await this.instance.delete<T>(url, config)
 
-		return response.data
+		return response
 	}
 
 	async patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig) {
-		const response = await this.instance.patch<T>(url, data, config)
+		const { data: response } = await this.instance.patch<T>(
+			url,
+			data,
+			config
+		)
 
-		return response.data
+		return response
 	}
 }
 

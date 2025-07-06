@@ -1,10 +1,60 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import * as dotenv from 'dotenv';
+import * as passport from 'passport';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+
+dotenv.config({ path: '.env.development' });
 
 (async () => {
   const app = await NestFactory.create(AppModule);
 
+  const config = new DocumentBuilder()
+    .setTitle('AskLoop API')
+    .setDescription('Q&A Platform API')
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
+    .build();
+
+  const configService = app.get(ConfigService);
+
+  app.use(passport.initialize());
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
+
+  app.enableCors({
+    origin: configService.get('ALLOWED_ORIGIN'),
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    exposedHeaders: ['Set-Cookie'],
+  });
+
   app.setGlobalPrefix('api');
 
-  await app.listen(3000);
+  const document = SwaggerModule.createDocument(app, config);
+
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
+
+  await app.listen(configService.getOrThrow('PORT'));
 })();

@@ -10,8 +10,8 @@ type AuthWrapperProps = {
 	withOAuth?: boolean
 	title: string
 	description: string
-	linkLabel: string
-	link: {
+	linkLabel?: string
+	link?: {
 		href: string
 		label: string
 	}
@@ -81,15 +81,17 @@ export const AuthWrapper = ({
 					variants={itemVariants}
 					className='text-muted-foreground text-center text-sm'
 				>
-					{linkLabel}
-					<Button
-						variant='link'
-						size='sm'
-						className='text-primary hover:text-primary/80 px-1'
-						asChild
-					>
-						<Link href={link.href}>{link.label}</Link>
-					</Button>
+					{linkLabel || ''}
+					{link && (
+						<Button
+							variant='link'
+							size='sm'
+							className='text-primary hover:text-primary/80 px-1'
+							asChild
+						>
+							<Link href={link.href}>{link.label}</Link>
+						</Button>
+					)}
 				</motion.div>
 			</motion.div>
 		</div>

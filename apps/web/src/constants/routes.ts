@@ -1,7 +1,8 @@
 export const PUBLIC_ROUTES = {
 	home: '/',
 	signIn: '/sign-in',
-	signUp: '/sign-up'
+	signUp: '/sign-up',
+	forgotPassword: '/forgot-password'
 }
 
 export const PROTECTED_ROUTES = {

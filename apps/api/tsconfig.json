@@ -21,8 +21,10 @@
     "paths": {
       "@modules/*": ["./src/modules/*"],
       "@common/*": ["./src/common/*"],
-      "@libs/*": ["./src/libs/*"],
-      "@sockets/*": ["./src/sockets/*"]
+      "@shared/*": ["./src/shared/*"],
+      "@sockets/*": ["./src/sockets/*"],
+      "@config/*": ["./src/config/*"],
+      "@database/*": ["./src/database/*"]
     }
   }
 }

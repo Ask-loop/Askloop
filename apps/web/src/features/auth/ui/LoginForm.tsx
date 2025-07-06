@@ -1,47 +1,25 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { motion } from 'framer-motion'
 import { ArrowRight, Link } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import {
 	FormProvider,
 	RHFInput,
 	RHFInputPassword
 } from '@/shared/form-controls'
+import { Spinner } from '@/shared/shadcn/ui'
 import { Button } from '@/shared/shadcn/ui/button'
-import { authSchema } from '../lib'
+import { authSchema, AuthSchemaType } from '../lib'
+import { useAuthStore } from '../model/auth.store'
+import { useSignIn } from '../model/hooks'
 import { AuthWrapper } from './AuthWrapper'
 import { ROUTES } from '@/constants'
 import dictionary from '@/dictionary/en'
 
-const containerVariants = {
-	hidden: { opacity: 0 },
-	visible: {
-		opacity: 1,
-		transition: {
-			staggerChildren: 0.1,
-			delayChildren: 0.2
-		}
-	}
-}
-
-const itemVariants = {
-	hidden: { y: 20, opacity: 0 },
-	visible: {
-		y: 0,
-		opacity: 1,
-		transition: {
-			type: 'spring',
-			stiffness: 100,
-			damping: 10
-		}
-	}
-}
-
 export const LoginForm = () => {
-	const router = useRouter()
+	const setUser = useAuthStore(state => state.setUser)
+
 	const methods = useForm({
 		mode: 'onChange',
 		resolver: zodResolver(authSchema),
@@ -51,13 +29,14 @@ export const LoginForm = () => {
 		}
 	})
 
-	const onSubmit = async (data: any) => {
-		try {
-			console.log(data)
-			router.push('/')
-		} catch (error) {
-			console.error('Login failed:', error)
-		}
+	const { signInMutation, isPending } = useSignIn()
+
+	const onSubmit = (data: AuthSchemaType) => {
+		signInMutation(data, {
+			onSuccess: response => {
+				setUser(response.data.user)
+			}
+		})
 	}
 
 	return (
@@ -93,7 +72,9 @@ export const LoginForm = () => {
 						className='text-primary hover:text-primary/80 text-sm'
 						asChild
 					>
-						<a href='/forgot-password'>Forgot password?</a>
+						<Link href={ROUTES.forgotPassword}>
+							Forgot password?
+						</Link>
 					</Button>
 				</div>
 
@@ -102,8 +83,14 @@ export const LoginForm = () => {
 					className='group w-full'
 					disabled={!methods.formState.isValid}
 				>
-					{dictionary.signIn}
-					<ArrowRight className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-1' />
+					{isPending ? (
+						<Spinner className='text-white' size={20} />
+					) : (
+						<>
+							{dictionary.signIn}
+							<ArrowRight className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-1' />
+						</>
+					)}
 				</Button>
 			</FormProvider>
 		</AuthWrapper>
