@@ -9,6 +9,7 @@ import { Button } from '@/shared/shadcn/ui/button'
 import { Input } from '@/shared/shadcn/ui/input'
 import { AskLoopLogo } from '@/shared/ui/Logo'
 import { ROUTES } from '@/constants/routes'
+import { UserMenu } from '@/entities/user/ui'
 
 export const Header = () => {
 	const { isAuthenticated, user } = useAuthStore(
@@ -53,24 +54,7 @@ export const Header = () => {
 								<BellIcon className='h-5 w-5' />
 							</Button>
 
-							<Button
-								variant='ghost'
-								size='icon'
-								aria-label='User menu'
-							>
-								<Avatar className='h-8 w-8'>
-									{user?.picture && (
-										<AvatarImage
-											src={user?.picture}
-											alt='@user'
-										/>
-									)}
-									<AvatarFallback>
-										{user?.firstName?.charAt(0) || 'U'}
-										{user?.lastName?.charAt(0) || 'U'}
-									</AvatarFallback>
-								</Avatar>
-							</Button>
+							<UserMenu />
 						</>
 					) : (
 						<>

@@ -38,7 +38,7 @@ export const RHFInput = (props: RHFInputProps) => {
 							{description}
 						</FormDescription>
 					)}
-					<FormControl className='rounded-md'>
+					<FormControl>
 						<Input
 							value={value}
 							ref={ref}

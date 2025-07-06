@@ -42,37 +42,44 @@ type ButtonProps = React.ComponentProps<'button'> &
 		spinnerSize?: number
 	}
 
-function Button({
-	className,
-	variant,
-	size,
-	asChild = false,
-	isLoading = false,
-	spinnerSize = 18,
-	children,
-	...props
-}: ButtonProps) {
-	const Comp = asChild ? Slot : 'button'
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+	(
+		{
+			className,
+			variant,
+			size,
+			asChild = false,
+			isLoading = false,
+			spinnerSize = 18,
+			children,
+			disabled,
+			...props
+		},
+		ref
+	) => {
+		const Comp = asChild ? Slot : 'button'
 
-	const disabled = isLoading || props.disabled
+		const isDisabled = isLoading || disabled
 
-	return (
-		<Comp
-			data-slot='button'
-			className={cn(buttonVariants({ variant, size, className }))}
-			{...props}
-			disabled={disabled}
-			aria-disabled={disabled}
-			aria-busy={isLoading}
-			aria-label={isLoading ? 'Loading...' : props['aria-label']}
-		>
-			{isLoading ? (
-				<Spinner className='size-4 text-white' size={spinnerSize} />
-			) : (
-				children
-			)}
-		</Comp>
-	)
-}
+		return (
+			<Comp
+				data-slot='button'
+				className={cn(buttonVariants({ variant, size, className }))}
+				{...props}
+				disabled={isDisabled}
+				aria-disabled={isDisabled}
+				aria-busy={isLoading}
+				aria-label={isLoading ? 'Loading...' : props['aria-label']}
+				ref={ref}
+			>
+				{isLoading ? (
+					<Spinner className='size-4 text-white' size={spinnerSize} />
+				) : (
+					children
+				)}
+			</Comp>
+		)
+	}
+)
 
 export { Button, buttonVariants }

@@ -1,5 +1,7 @@
-import { Icon } from '@radix-ui/react-select'
+'use client'
+
 import MDEditor, { ContextStore, commands } from '@uiw/react-md-editor'
+import { useTheme } from 'next-themes'
 import { ChangeEvent } from 'react'
 
 type MarkdownEditorProps = {
@@ -17,6 +19,7 @@ export const MarkdownEditor = ({
 	onChange,
 	placeholder
 }: MarkdownEditorProps) => {
+	const { theme } = useTheme()
 	return (
 		<MDEditor
 			className='border-input border'
@@ -24,7 +27,7 @@ export const MarkdownEditor = ({
 			onChange={onChange}
 			height={300}
 			tabSize={2}
-			data-color-mode='light'
+			data-color-mode={theme === 'dark' ? 'dark' : 'light'}
 			preview='edit'
 			visibleDragbar={false}
 			commands={[

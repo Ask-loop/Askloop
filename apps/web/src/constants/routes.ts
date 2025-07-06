@@ -10,7 +10,7 @@ export const PUBLIC_ROUTES = {
 
 export const PROTECTED_ROUTES = {
 	create: '/create',
-	profile: '/profile/:username',
+	userProfile: '/user/:id/:slug',
 	settings: '/settings',
 	ask: '/ask'
 }

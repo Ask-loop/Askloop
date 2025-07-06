@@ -1,9 +1,8 @@
 'use client'
 
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
-import { Button } from '../shadcn/ui/button'
+import { useBoolean } from 'usehooks-ts'
 import {
 	FormControl,
 	FormField,
@@ -18,18 +17,18 @@ export type RHFInputPasswordProps =
 		name: string
 		label?: string
 		className?: string
+		description?: string
 	}
 
 export const RHFInputPassword = ({
 	name,
 	label,
 	className,
+	description,
 	...rest
 }: RHFInputPasswordProps) => {
 	const { control } = useFormContext()
-	const [showPassword, setShowPassword] = useState(false)
-
-	const toggle = () => setShowPassword(prev => !prev)
+	const { value: showPassword, setTrue, setFalse } = useBoolean(false)
 
 	return (
 		<FormField
@@ -38,28 +37,27 @@ export const RHFInputPassword = ({
 			render={({ field }) => (
 				<FormItem>
 					{label && <FormLabel>{label}</FormLabel>}
+
 					<FormControl>
-						<div className='relative'>
-							<Input
-								{...field}
-								{...rest}
-								type={showPassword ? 'text' : 'password'}
-							/>
-							<Button
-								variant='ghost'
-								size='icon'
-								className='absolute top-1/2 right-2 h-auto -translate-y-1/2 p-1'
-								onClick={toggle}
-								type='button'
-								tabIndex={-1}
-							>
-								{showPassword ? (
-									<EyeOffIcon className='h-4 w-4' />
+						<Input
+							{...field}
+							{...rest}
+							type={showPassword ? 'text' : 'password'}
+							icon={
+								showPassword ? (
+									<EyeOffIcon
+										onClick={setFalse}
+										className='text-muted-foreground size-4 cursor-pointer'
+									/>
 								) : (
-									<EyeIcon className='h-4 w-4' />
-								)}
-							</Button>
-						</div>
+									<EyeIcon
+										onClick={setTrue}
+										className='text-muted-foreground size-4 cursor-pointer'
+									/>
+								)
+							}
+							iconPosition='right'
+						/>
 					</FormControl>
 					<FormMessage />
 				</FormItem>

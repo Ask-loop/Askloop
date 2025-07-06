@@ -31,7 +31,7 @@ export const ResetPassword = () => {
 		<AuthWrapper
 			title={dictionary.resetPassword.title}
 			description={dictionary.resetPassword.description}
-			linkLabel={dictionary.register.alreadyHaveAccount}
+			linkLabel={dictionary.backToSignIn}
 			link={{
 				label: dictionary.signIn,
 				href: ROUTES.signIn

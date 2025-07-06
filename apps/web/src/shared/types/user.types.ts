@@ -1,10 +1,10 @@
 export type User = {
-	id: string
+	id: number
 	email: string
 	emailVerified: boolean
 	picture: string
 	firstName: string
 	lastName: string
-	createdAt: Date
-	updatedAt: Date
+	createdAt: string
+	updatedAt: string
 }
