@@ -1,6 +1,7 @@
 'use client'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ThemeProvider } from 'next-themes'
 import { Toaster } from 'sonner'
 
 const queryClient = new QueryClient({
@@ -25,7 +26,9 @@ export const Provider = ({ children }: { children: React.ReactNode }) => {
 				theme='dark'
 			/>
 
-			{children}
+			<ThemeProvider attribute='class' defaultTheme='system' enableSystem>
+				{children}
+			</ThemeProvider>
 		</QueryClientProvider>
 	)
 }
