@@ -1,24 +1,22 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import {
 	FormProvider,
 	RHFInput,
 	RHFInputPassword
 } from '@/shared/form-controls'
+import { Spinner } from '@/shared/shadcn/ui'
 import { Button } from '@/shared/shadcn/ui/button'
-import { authSchema } from '../lib'
+import { authSchema, AuthSchemaType } from '../lib'
+import { useSignUp } from '../model/hooks'
 import { AuthWrapper } from './AuthWrapper'
 import { ROUTES } from '@/constants'
 import dictionary from '@/dictionary/en'
 
 export const RegisterForm = () => {
-	const router = useRouter()
 	const methods = useForm({
 		mode: 'onChange',
 		resolver: zodResolver(authSchema),
@@ -28,13 +26,10 @@ export const RegisterForm = () => {
 		}
 	})
 
-	const onSubmit = async (data: any) => {
-		try {
-			console.log(data)
-			router.push('/')
-		} catch (error) {
-			console.error('Login failed:', error)
-		}
+	const { signUpMutation, isPending } = useSignUp()
+
+	const onSubmit = (data: AuthSchemaType) => {
+		signUpMutation(data)
 	}
 
 	return (
@@ -66,9 +61,9 @@ export const RegisterForm = () => {
 				<Button
 					type='submit'
 					className='group w-full'
-					disabled={!methods.formState.isValid}
+					disabled={!methods.formState.isValid || isPending}
 				>
-					Sign in
+					{isPending ? <Spinner /> : dictionary.signUp}
 					<ArrowRight className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-1' />
 				</Button>
 			</FormProvider>

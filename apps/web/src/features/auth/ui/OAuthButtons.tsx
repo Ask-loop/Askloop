@@ -2,6 +2,8 @@ import { motion } from 'framer-motion'
 import { FaGithub } from 'react-icons/fa6'
 import { FcGoogle } from 'react-icons/fc'
 import { Button } from '@/shared/shadcn/ui/button'
+import { AuthProviders } from '@/shared/types'
+import { getOAuthUrl } from '../lib/getOAuthUrl'
 
 const containerVariants = {
 	hidden: { opacity: 0 },
@@ -14,20 +16,11 @@ const containerVariants = {
 	}
 }
 
-const itemVariants = {
-	hidden: { y: 20, opacity: 0 },
-	visible: {
-		y: 0,
-		opacity: 1,
-		transition: {
-			type: 'spring',
-			stiffness: 100,
-			damping: 10
-		}
-	}
-}
-
 export const OAuthButtons = () => {
+	const handleSignInWithProvider = async (provider: AuthProviders) => {
+		window.location.href = getOAuthUrl(provider)
+	}
+
 	return (
 		<motion.div
 			initial='hidden'
@@ -35,11 +28,25 @@ export const OAuthButtons = () => {
 			variants={containerVariants}
 			className='flex flex-col gap-2'
 		>
-			<Button variant='outline' className='w-full rounded-full'>
+			<Button
+				variant='outline'
+				className='w-full rounded-full'
+				onClick={handleSignInWithProvider.bind(
+					null,
+					AuthProviders.GOOGLE
+				)}
+			>
 				<FcGoogle className='mr-2 h-4 w-4' />
 				Continue with Google
 			</Button>
-			<Button variant='outline' className='w-full rounded-full'>
+			<Button
+				variant='outline'
+				className='w-full rounded-full'
+				onClick={handleSignInWithProvider.bind(
+					null,
+					AuthProviders.GITHUB
+				)}
+			>
 				<FaGithub className='mr-2 h-4 w-4' />
 				Continue with GitHub
 			</Button>

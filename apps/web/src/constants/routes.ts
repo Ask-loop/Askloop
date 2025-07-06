@@ -2,6 +2,7 @@ export const PUBLIC_ROUTES = {
 	home: '/',
 	signIn: '/sign-in',
 	signUp: '/sign-up',
+	resetPassword: '/reset-password',
 	questions: '/questions',
 	tags: '/tags',
 	users: '/users'

@@ -5,13 +5,6 @@ import { useForm } from 'react-hook-form'
 import { FormProvider, RHFInput } from '@/shared/form-controls'
 import { Button } from '@/shared/shadcn/ui/button'
 import {
-	Card,
-	CardContent,
-	CardFooter,
-	CardHeader,
-	CardTitle
-} from '@/shared/shadcn/ui/card'
-import {
 	FormControl,
 	FormDescription,
 	FormField,
