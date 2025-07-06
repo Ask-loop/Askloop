@@ -5,23 +5,17 @@ import { AuthDto, VerifyEmailDto, RefreshTokenDto, RequestPasswordResetDto, Rese
 import { GoogleOAuthGuard } from './guards/google.guard';
 import { Response } from 'express';
 import { AuthGuard } from './guards/auth.guard';
-import { AuthenticationMethod } from '@shared/enums';
 import { GithubOAuthGuard } from './guards/github.guard';
 import { SignInResponse } from './types/sign-in.types';
-import { ConfigService } from '@nestjs/config';
-import { User } from '@modules/users/entities/user.entity';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { IApiResponse } from '@common/interfaces/response.interface';
+import { Message } from '@common/decorators/message.decorator';
 
 @ApiBearerAuth('JWT-auth')
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('sign-in')
   @Throttle({ default: { limit: 5, ttl: 60 } })
@@ -33,6 +27,7 @@ export class AuthController {
   @Post('sign-up')
   @Throttle({ default: { limit: 3, ttl: 300 } })
   @HttpCode(200)
+  @Message('Email verification sent. Please check your email.')
   async signUp(@Body() authDto: AuthDto) {
     return this.authService.signUp(authDto);
   }
@@ -59,6 +54,7 @@ export class AuthController {
   @Post('request-password-reset')
   @Throttle({ default: { limit: 3, ttl: 300 } })
   @HttpCode(200)
+  @Message('Password reset email sent. Please check your email.')
   async requestPasswordReset(@Body() requestPasswordResetDto: RequestPasswordResetDto) {
     return this.authService.requestPasswordReset(requestPasswordResetDto.email);
   }
@@ -92,24 +88,12 @@ export class AuthController {
   @Get('oauth/callback/google')
   @UseGuards(GoogleOAuthGuard)
   async oauthCallbackGoogle(@Req() req: Request & { user: { data: SignInResponse } }, @Res() res: Response) {
-    const { accessToken, refreshToken, user } = req?.user?.data;
-
-    const redirectUrl = this.configService.getOrThrow<string>('ALLOWED_ORIGIN');
-
-    const encodedUser = encodeURIComponent(JSON.stringify(user));
-
-    return res.redirect(`${redirectUrl}/oauth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&user=${encodedUser}`);
+    return this.authService.callbackOauth(req, res);
   }
 
   @Get('oauth/callback/github')
   @UseGuards(GithubOAuthGuard)
   async oauthCallbackGithub(@Req() req: Request & { user: { data: SignInResponse } }, @Res() res: Response) {
-    const { accessToken, refreshToken, user } = req?.user?.data;
-
-    const redirectUrl = this.configService.getOrThrow<string>('ALLOWED_ORIGIN');
-
-    const encodedUser = encodeURIComponent(JSON.stringify(user));
-
-    return res.redirect(`${redirectUrl}/oauth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&user=${encodedUser}`);
+    return this.authService.callbackOauth(req, res);
   }
 }

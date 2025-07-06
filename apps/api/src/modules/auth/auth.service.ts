@@ -9,6 +9,9 @@ import { TokensService } from '@modules/tokens/tokens.service';
 import { comparePasswords, hashPassword } from '@shared/utils/password';
 import { successResponse } from '@shared/utils/response';
 import { User } from '@modules/users/entities';
+import { SignInResponse } from './types/sign-in.types';
+import { ConfigService } from '@nestjs/config';
+import { Request, Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +20,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly mailService: MailService,
     private readonly accountsService: AccountsService,
+    private readonly configService: ConfigService,
   ) {}
 
   // --- CORE AUTH METHODS --- //
@@ -52,10 +56,10 @@ export class AuthService {
 
     const tokens = await this.tokensService.generateTokens(user.id);
 
-    return successResponse({
+    return {
       ...tokens,
       user: this.normalizeUser(user),
-    });
+    };
   }
 
   async signUp({ email, password }: AuthDto) {
@@ -79,13 +83,10 @@ export class AuthService {
 
     await this.sendVerificationEmail(email, verificationToken);
 
-    return successResponse(
-      {
-        ...tokens,
-        user: this.normalizeUser(user),
-      },
-      'Email verification sent. Please check your email.',
-    );
+    return {
+      ...tokens,
+      user: this.normalizeUser(user),
+    };
   }
 
   async verifyEmail(verificationToken: string) {
@@ -98,14 +99,10 @@ export class AuthService {
     if (user.emailVerified) throw new BadRequestException('Email already verified');
 
     await this.usersService.update(user.id, { emailVerified: true });
-
-    return successResponse(null, 'Email verified successfully');
   }
 
   async signOut(userId: number) {
     await this.tokensService.revokeAllRefreshTokens(userId);
-
-    return successResponse(null, 'Signed out successfully');
   }
 
   async requestPasswordReset(email: string) {
@@ -122,8 +119,6 @@ export class AuthService {
     }
 
     await this.sendPasswordResetEmail(email);
-
-    return successResponse(null, 'Password reset email sent. Please check your email.');
   }
 
   async resetPassword(token: string, newPassword: string) {
@@ -136,8 +131,6 @@ export class AuthService {
     const hashedPassword = await hashPassword(newPassword);
 
     await this.usersService.update(user.id, { password: hashedPassword });
-
-    return successResponse(null, 'Password reset successfully');
   }
 
   async changePassword(userId: number, oldPassword: string, newPassword: string) {
@@ -152,8 +145,6 @@ export class AuthService {
     const hashedPassword = await hashPassword(newPassword);
 
     await this.usersService.update(userId, { password: hashedPassword });
-
-    return successResponse(null, 'Password changed successfully');
   }
 
   async refreshTokens(refreshToken: string) {
@@ -167,13 +158,10 @@ export class AuthService {
 
     const tokens = await this.tokensService.generateTokens(userId);
 
-    return successResponse(
-      {
-        ...tokens,
-        user: this.normalizeUser(user),
-      },
-      'Tokens refreshed successfully',
-    );
+    return {
+      ...tokens,
+      user: this.normalizeUser(user),
+    };
   }
 
   async deleteAccount(userId: number) {
@@ -184,8 +172,6 @@ export class AuthService {
     await this.tokensService.revokeAllRefreshTokens(userId);
 
     await this.usersService.delete(userId);
-
-    return successResponse(null, 'Account deleted successfully');
   }
 
   // --- OAUTH METHODS --- //
@@ -243,8 +229,14 @@ export class AuthService {
     );
   }
 
-  async connectOauth(provider: AuthenticationMethod) {
-    return successResponse(null, `Connected to ${provider}`);
+  async callbackOauth(req: Request & { user: { data: SignInResponse } }, res: Response) {
+    const { accessToken, refreshToken, user } = req?.user?.data;
+
+    const redirectUrl = this.configService.getOrThrow<string>('ALLOWED_ORIGIN');
+
+    const encodedUser = encodeURIComponent(JSON.stringify(user));
+
+    return res.redirect(`${redirectUrl}/oauth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&user=${encodedUser}`);
   }
 
   // --- EMAIL METHODS --- //

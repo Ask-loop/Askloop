@@ -1,8 +1,8 @@
 'use server'
 
 import { cookies } from 'next/headers'
+import { Tokens } from '../../types'
 import { Cookies } from '@/constants/cookies'
-import { Tokens } from '../../model/types'
 
 export const setAuthCookie = async (tokens: Tokens) => {
 	const cookieStore = await cookies()

@@ -5,7 +5,7 @@ import axios, {
 	AxiosResponse,
 	InternalAxiosRequestConfig
 } from 'axios'
-import { AuthEndpoints } from '@/features/auth/lib/constants'
+import { AuthEndpoints } from '@/features/auth/api/endpoints'
 import {
 	clearAuthCookie,
 	getAuthCookie,

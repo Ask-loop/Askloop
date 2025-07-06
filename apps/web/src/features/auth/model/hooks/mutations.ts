@@ -1,21 +1,24 @@
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import {
-	toastCatchError,
-	toastSuccess
-} from '@/shared/utils/toast-message-handler'
-import {
 	requestPasswordReset,
 	resetPassword,
 	signIn,
 	signUp,
 	verifyEmail,
 	logout
-} from '../../api'
-import { clearAuthCookie, setAuthCookie } from '../../lib'
-import { AuthSchemaType, ResetPasswordSchemaType } from '../../lib/schema'
-import { useAuthStore } from '../auth.store'
-import { ResetPasswordReq, VerifyEmailReq } from '../types'
+} from '@/features/auth/api'
+import { clearAuthCookie, setAuthCookie } from '@/features/auth/lib'
+import {
+	AuthSchemaType,
+	ResetPasswordSchemaType
+} from '@/features/auth/lib/schema'
+import { useAuthStore } from '@/features/auth/model/auth.store'
+import { ResetPasswordReq, VerifyEmailReq } from '@/features/auth/types'
+import {
+	toastCatchError,
+	toastSuccess
+} from '@/shared/utils/toast-message-handler'
 import { ROUTES } from '@/constants'
 
 export const useSignIn = () => {
@@ -23,17 +26,17 @@ export const useSignIn = () => {
 
 	const { mutate: signInMutation, isPending } = useMutation({
 		mutationFn: (params: AuthSchemaType) => signIn(params),
-		onSuccess: response => {
-			setAuthCookie({
-				accessToken: response.data.accessToken,
-				refreshToken: response.data.refreshToken
+		onSuccess: async response => {
+			const { accessToken, refreshToken } = response.data
+
+			await setAuthCookie({
+				accessToken,
+				refreshToken
 			})
 
 			router.push(ROUTES.home)
 		},
-		onError: error => {
-			toastCatchError(error)
-		}
+		onError: toastCatchError
 	})
 
 	return { signInMutation, isPending }

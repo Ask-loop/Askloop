@@ -1,8 +1,15 @@
+import {
+	AuthSchemaType,
+	ResetPasswordSchemaType
+} from '@/features/auth/lib/schema'
+import {
+	AuthResponse,
+	ResetPasswordReq,
+	VerifyEmailReq
+} from '@/features/auth/types'
 import { axiosInstance } from '@/shared/api'
 import { ApiResponse } from '@/shared/types'
-import { AuthEndpoints } from '../lib/constants'
-import { AuthSchemaType, ResetPasswordSchemaType } from '../lib/schema'
-import { AuthResponse, ResetPasswordReq, VerifyEmailReq } from '../model/types'
+import { AuthEndpoints } from './endpoints'
 
 export const signIn = async (params: AuthSchemaType) => {
 	const response = await axiosInstance.post<ApiResponse<AuthResponse>>(

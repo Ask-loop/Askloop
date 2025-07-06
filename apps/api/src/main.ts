@@ -1,15 +1,19 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as dotenv from 'dotenv';
 import * as passport from 'passport';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { AllExceptionsFilter } from '@common/filters';
+import { TransformInterceptor } from '@common/interceptors';
 
 dotenv.config({ path: '.env.development' });
 
 (async () => {
   const app = await NestFactory.create(AppModule);
+
+  const reflector = app.get(Reflector);
 
   const config = new DocumentBuilder()
     .setTitle('AskLoop API')
@@ -45,6 +49,9 @@ dotenv.config({ path: '.env.development' });
     credentials: true,
     exposedHeaders: ['Set-Cookie'],
   });
+
+  app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalInterceptors(new TransformInterceptor(reflector));
 
   app.setGlobalPrefix('api');
 

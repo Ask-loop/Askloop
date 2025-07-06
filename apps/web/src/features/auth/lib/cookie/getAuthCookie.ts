@@ -1,7 +1,7 @@
 'use server'
 
 import { cookies } from 'next/headers'
-import { Tokens } from '../../model/types'
+import { Tokens } from '../../types'
 import { Cookies } from '@/constants/cookies'
 
 export const getAuthCookie = async () => {

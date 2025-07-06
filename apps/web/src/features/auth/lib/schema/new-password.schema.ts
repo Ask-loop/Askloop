@@ -1,9 +1,10 @@
 import { z } from 'zod'
+import { passwordRegex } from '../regex'
 
 export const newPasswordSchema = z.object({
 	newPassword: z
 		.string()
-		.min(8, 'Password must be at least 8 characters')
+		.regex(passwordRegex, 'Invalid password')
 		.min(1, 'Password is required')
 })
 
