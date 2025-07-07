@@ -4,9 +4,10 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "build": "nest build",
-    "migration:generate": "nest g migration",
-    "migration:run": "nest run migration:run",
-    "migration:revert": "nest run migration:revert"
+    "migration:generate": "typeorm migration:generate src/database/migrations/migrations -d dist/src/database/data-source.js",
+    "migration:run": "typeorm migration:run -d dist/src/database/data-source.js",
+    "migration:revert": "typeorm migration:revert -d dist/src/database/data-source.js",
+    "migration:show": "typeorm migration:show -d dist/src/database/data-source.js"
   },
   "keywords": [],
   "author": "",
@@ -39,6 +40,7 @@
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
+    "slugify": "^1.6.6",
     "typeorm": "^0.3.25"
   },
   "devDependencies": {

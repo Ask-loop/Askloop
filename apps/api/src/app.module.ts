@@ -17,6 +17,9 @@ import { AccountsModule } from '@modules/accounts/accounts.module';
 import { TokensModule } from '@modules/tokens/tokens.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
+import { QuestionsModule } from '@modules/questions/questions.module';
+import { TagsModule } from '@modules/tags/tags.module';
+import { ActivitiesModule } from '@modules/activities/activities.module';
 
 @Module({
   imports: [
@@ -48,6 +51,9 @@ import { ScheduleModule } from '@nestjs/schedule';
     MailModule,
     AccountsModule,
     TokensModule,
+    QuestionsModule,
+    TagsModule,
+    ActivitiesModule,
   ],
 })
 export class AppModule {}

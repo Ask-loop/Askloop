@@ -1,7 +1,8 @@
 import { registerAs } from '@nestjs/config';
 import * as dotenv from 'dotenv';
+import { Environment } from './app.config';
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
+dotenv.config({ path: `.env.${process.env.NODE_ENV || Environment.DEVELOPMENT}` });
 
 export default registerAs('database', () => ({
   type: process.env.DATABASE_TYPE || 'postgres',
