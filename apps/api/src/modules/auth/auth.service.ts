@@ -232,6 +232,8 @@ export class AuthService {
   async callbackOauth(req: Request & { user: { data: SignInResponse } }, res: Response) {
     const { accessToken, refreshToken, user } = req?.user?.data;
 
+    console.log('user', user);
+
     const redirectUrl = this.configService.getOrThrow<string>('ALLOWED_ORIGIN');
 
     const encodedUser = encodeURIComponent(JSON.stringify(user));

@@ -9,7 +9,7 @@ export const askQuestionSchema = z.object({
 		.string()
 		.min(20, 'Description must be at least 20 characters')
 		.max(1000, 'Description must be less than 1000 characters'),
-	tags: z
+	tagIds: z
 		.array(z.string())
 		.min(1, 'Select at least 1 tag')
 		.max(5, 'Select at most 5 tags')
