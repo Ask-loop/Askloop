@@ -12,13 +12,21 @@ import {
 	CommandEmpty
 } from '@/shared/shadcn/ui/command'
 
+type TagOption = { label: string; value: number | string }
+
 export type TagInputProps = {
 	value: string[]
-	options: string[]
+	options: TagOption[]
 	onChange: (tags: string[]) => void
+	onSearchChange: (search: string) => void
 }
 
-export function TagInput({ value, options, onChange }: TagInputProps) {
+export function TagInput({
+	value,
+	options,
+	onChange,
+	onSearchChange
+}: TagInputProps) {
 	const [inputValue, setInputValue] = useState('')
 	const [activeIndex, setActiveIndex] = useState(0)
 	const inputRef = useRef<HTMLInputElement>(null)
@@ -27,15 +35,17 @@ export function TagInput({ value, options, onChange }: TagInputProps) {
 		() =>
 			options.filter(
 				option =>
-					option.toLowerCase().includes(inputValue.toLowerCase()) &&
-					!value.includes(option)
+					option.label
+						.toLowerCase()
+						.includes(inputValue.toLowerCase()) &&
+					!value.some(v => v === option.value)
 			),
 		[inputValue, options, value]
 	)
 
-	const addTag = (tag: string) => {
-		if (!tag.trim() || value.includes(tag)) return
-		onChange([...value, tag.trim()])
+	const addTag = (tag: TagOption) => {
+		if (!tag.label.trim() || value.some(v => v === tag.value)) return
+		onChange([...value, tag.value.toString()])
 		setInputValue('')
 		setActiveIndex(0)
 	}
@@ -55,13 +65,13 @@ export function TagInput({ value, options, onChange }: TagInputProps) {
 			if (!inputValue.trim()) return
 
 			const matchedOption = filteredOptions.find(option =>
-				option.toLowerCase().includes(inputValue.toLowerCase())
+				option.label.toLowerCase().includes(inputValue.toLowerCase())
 			)
 
 			if (matchedOption) {
 				addTag(matchedOption)
 			} else {
-				addTag(inputValue)
+				addTag({ label: inputValue, value: inputValue })
 			}
 
 			return
@@ -82,6 +92,10 @@ export function TagInput({ value, options, onChange }: TagInputProps) {
 		}
 	}
 
+	const addedTags = useMemo(() => {
+		return options.filter(option => value.includes(option.value.toString()))
+	}, [options, value])
+
 	return (
 		<div
 			className={cn(
@@ -90,16 +104,17 @@ export function TagInput({ value, options, onChange }: TagInputProps) {
 				'border-input'
 			)}
 		>
-			{value.map(tag => (
+			{addedTags.map(tag => (
 				<Badge
-					key={tag}
+					key={tag.value}
 					variant='outline'
 					className='flex items-center gap-1 rounded-md p-0 pl-1 text-sm'
 				>
-					{tag}
+					{tag.label}
 					<button
+						type='button'
 						className='hover:bg-muted cursor-pointer p-1'
-						onClick={() => removeTag(tag)}
+						onClick={removeTag.bind(null, tag.value.toString())}
 					>
 						<X className='text-muted-foreground h-3 w-3' />
 					</button>
@@ -113,6 +128,7 @@ export function TagInput({ value, options, onChange }: TagInputProps) {
 					onChange={e => {
 						setInputValue(e.target.value)
 						setActiveIndex(0)
+						onSearchChange(e.target.value)
 					}}
 					onKeyDown={handleKeyDown}
 					className='border-0 outline-none'
@@ -129,7 +145,7 @@ export function TagInput({ value, options, onChange }: TagInputProps) {
 									<CommandGroup>
 										{filteredOptions.map((tag, i) => (
 											<CommandItem
-												key={tag}
+												key={tag.label}
 												onSelect={() => addTag(tag)}
 												className={cn(
 													'cursor-pointer',
@@ -137,7 +153,7 @@ export function TagInput({ value, options, onChange }: TagInputProps) {
 														'bg-accent text-accent-foreground'
 												)}
 											>
-												{tag}
+												{tag.label}
 											</CommandItem>
 										))}
 									</CommandGroup>

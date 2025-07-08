@@ -1,7 +1,7 @@
 'use client'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ThemeProvider } from 'next-themes'
+import { ThemeProvider, useTheme } from 'next-themes'
 import { Toaster } from 'sonner'
 
 const queryClient = new QueryClient({
@@ -16,6 +16,7 @@ const queryClient = new QueryClient({
 })
 
 export const Provider = ({ children }: { children: React.ReactNode }) => {
+	const { theme } = useTheme()
 	return (
 		<QueryClientProvider client={queryClient}>
 			<Toaster
@@ -23,7 +24,7 @@ export const Provider = ({ children }: { children: React.ReactNode }) => {
 				duration={5000}
 				richColors
 				closeButton
-				theme='dark'
+				theme={theme === 'dark' ? 'dark' : 'light'}
 			/>
 
 			<ThemeProvider attribute='class' defaultTheme='system' enableSystem>

@@ -89,11 +89,11 @@ export class UsersService {
     const user = User.create(dto);
     const savedUser = await user.save();
 
-    // Create user stats
-    await this.usersStatsService.createUserStats(savedUser.id);
+    await this.usersStatsService.initUserStats(savedUser.id);
 
-    // Track registration activity
-    await this.activitiesService.trackActivity(savedUser.id, ActivityType.Registration);
+    await this.activitiesService.trackActivity(savedUser.id, ActivityType.Registration, {
+      user: savedUser,
+    });
 
     return savedUser;
   }

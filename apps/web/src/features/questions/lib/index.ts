@@ -1,0 +1,1 @@
+export { useInvalidateQueries } from './invalidateQueries'

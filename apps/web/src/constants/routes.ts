@@ -4,6 +4,7 @@ export const PUBLIC_ROUTES = {
 	signUp: '/sign-up',
 	resetPassword: '/reset-password',
 	questions: '/questions',
+	question: '/questions/:slug',
 	tags: '/tags',
 	users: '/users'
 }

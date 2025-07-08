@@ -3,3 +3,8 @@ export type ApiResponse<T> = {
 	message?: string
 	success: boolean
 }
+
+export type Pagination = {
+	page?: number
+	limit?: number
+}
