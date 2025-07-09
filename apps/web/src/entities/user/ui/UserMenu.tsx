@@ -56,10 +56,7 @@ export const UserMenu = () => {
 				<UserAvatar src={user?.picture} fallback={fallback} />
 			</DropdownMenuTrigger>
 
-			<DropdownMenuContent
-				className='bg-background mt-2.5 border-none p-2'
-				align='center'
-			>
+			<DropdownMenuContent className='p-2 shadow-none' align='center'>
 				<DropdownMenuGroup className='space-y-2'>
 					<DropdownMenuItem
 						asChild

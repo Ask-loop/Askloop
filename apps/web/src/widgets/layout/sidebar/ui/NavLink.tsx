@@ -20,7 +20,7 @@ export const NavLink = ({ href, icon, title }: NavLinkProps) => {
 			href={href}
 			tabIndex={0}
 			className={cn(
-				'group flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 outline-none',
+				'group flex items-center gap-3 rounded-lg px-2 py-3 transition-all duration-200 outline-none',
 				isActive
 					? 'bg-primary/15 text-primary font-bold'
 					: 'text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground',

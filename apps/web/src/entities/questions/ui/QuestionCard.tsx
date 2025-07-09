@@ -1,120 +1,80 @@
-import { AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
-import { motion } from 'framer-motion'
-import { MessageSquare, Eye } from 'lucide-react'
 import Link from 'next/link'
+import { FaArrowUp, FaEye } from 'react-icons/fa'
 import { formatTimeAgo } from '@/shared/lib/utils'
-import { Avatar } from '@/shared/shadcn/ui/avatar'
-import { Badge } from '@/shared/shadcn/ui/badge'
-import { Card } from '@/shared/shadcn/ui/card'
+import { Button } from '@/shared/shadcn/ui'
+import { Card, CardContent, CardFooter } from '@/shared/shadcn/ui/card'
 import { Question } from '@/shared/types/question'
 import { Tag } from '@/shared/types/tag'
 import { MarkdownParser } from '@/shared/ui/MarkdowParser'
 import { ROUTES } from '@/constants'
+import { UserAvatar } from '@/entities/user/ui/UserAvatar'
 
 type QuestionCardProps = {
 	question: Question
 	onTagClick?: (tag: Tag) => void
-	variant?: 'default' | 'compact'
 }
 
-export const QuestionCard = ({
-	question,
-	onTagClick,
-	variant = 'default'
-}: QuestionCardProps) => {
+export const QuestionCard = ({ question, onTagClick }: QuestionCardProps) => {
 	return (
-		<motion.div
-			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
-			whileHover={{ y: -2 }}
-			transition={{ duration: 0.2 }}
-		>
-			<Card
-				className={`bg-card hover:border-primary/30 overflow-hidden rounded-xl border ${variant === 'compact' ? 'p-4' : 'p-6'}`}
-			>
-				<div className='flex flex-col gap-4'>
-					<div className='flex items-start justify-between gap-3'>
-						<div className='flex items-center gap-3'>
-							<Avatar className='h-8 w-8 sm:h-10 sm:w-10'>
-								<AvatarImage
-									src={
-										question.user?.picture ||
-										'/placeholder.svg'
-									}
-									alt={question.user?.email || 'User'}
-								/>
-								<AvatarFallback className='bg-primary/10 text-primary font-medium'>
-									{question.user?.email
-										?.charAt(0)
-										.toUpperCase()}
-								</AvatarFallback>
-							</Avatar>
-
-							<div className='min-w-0 flex-1'>
-								<p className='truncate text-sm font-medium'>
-									{question.user?.displayName || 'Anonymous'}
-								</p>
-								<p className='text-muted-foreground text-xs'>
-									{formatTimeAgo(question.createdAt)}
-								</p>
-							</div>
-						</div>
-
-						<div className='flex items-center gap-2'>
-							<Badge
-								variant='secondary'
-								className='gap-1 px-2 py-1 text-xs'
-							>
-								<MessageSquare className='h-3 w-3' />
-								<span>{0}</span>
-							</Badge>
-							{variant !== 'compact' && (
-								<Badge
-									variant='outline'
-									className='gap-1 px-2 py-1 text-xs'
-								>
-									<Eye className='h-3 w-3' />
-									<span>{0}</span>
-								</Badge>
-							)}
-						</div>
-					</div>
-
+		<Card className='overflow-hidden rounded-sm transition-shadow duration-200 hover:shadow-md'>
+			<CardContent className='grid gap-3'>
+				<div className='grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto] sm:items-start'>
 					<Link
 						href={ROUTES.question.replace(':slug', question.slug)}
-						className='group block space-y-2'
+						className='group block'
 					>
-						<h3
-							className={`text-card-foreground group-hover:text-primary font-semibold transition-colors ${variant === 'compact' ? 'line-clamp-1 text-base' : 'line-clamp-2 text-lg'}`}
-						>
+						<h3 className='group-hover:text-primary line-clamp-2 text-base font-semibold transition-colors sm:text-lg'>
 							{question.title}
 						</h3>
-
-						{variant !== 'compact' && (
-							<div className='prose prose-sm dark:prose-invert text-muted-foreground line-clamp-3'>
-								<MarkdownParser markdown={question.body} />
-							</div>
-						)}
 					</Link>
 
-					{question.tags?.length > 0 && (
-						<div className='flex flex-wrap gap-2'>
-							{question.tags.map(tag => (
-								<Badge
-									key={tag.id}
-									variant='destructive'
-									onClick={e => {
-										e.stopPropagation()
-										onTagClick?.(tag)
-									}}
-								>
-									{tag.name}
-								</Badge>
-							))}
-						</div>
-					)}
+					<div className='text-muted-foreground flex items-center gap-1 text-xs sm:text-sm'>
+						<FaEye className='size-3 sm:size-4' />
+						<span>12</span>
+					</div>
 				</div>
-			</Card>
-		</motion.div>
+
+				<div className='line-clamp-2 max-w-prose text-sm sm:text-base'>
+					<MarkdownParser markdown={question.body} />
+				</div>
+
+				<div className='flex flex-wrap gap-1 sm:gap-2'>
+					{question.tags.map(tag => (
+						<Button
+							key={tag.id}
+							variant='outline'
+							size='sm'
+							className='hover:border-primary hover:bg-primary/10 h-5 bg-transparent px-2 text-xs sm:h-6'
+							onClick={() => onTagClick?.(tag)}
+						>
+							{tag.name}
+						</Button>
+					))}
+				</div>
+			</CardContent>
+
+			<CardFooter className='grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto] sm:items-center'>
+				<div className='text-muted-foreground flex items-center gap-2 text-xs sm:text-sm'>
+					<UserAvatar
+						src={question.user.picture}
+						className='size-6 sm:size-8'
+						fallback={
+							question.user.displayName?.charAt(0) ??
+							question.user.email?.charAt(0)
+						}
+					/>
+					<span className='line-clamp-1'>
+						{question.user.displayName ?? question.user.email}
+						&nbsp;•&nbsp;asked&nbsp;
+						{formatTimeAgo(question.createdAt)}
+					</span>
+				</div>
+
+				<div className='text-muted-foreground flex items-center gap-1 text-xs sm:text-sm'>
+					<FaArrowUp className='size-3 sm:size-4' />
+					<span>12</span>
+				</div>
+			</CardFooter>
+		</Card>
 	)
 }

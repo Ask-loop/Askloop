@@ -12,7 +12,7 @@ export const UserAvatar = ({ className, fallback, src }: UserAvatarProps) => {
 		<Avatar className={cn('size-10', className)}>
 			<AvatarImage src={src} />
 
-			<AvatarFallback>{fallback}</AvatarFallback>
+			<AvatarFallback>{fallback ?? '?'}</AvatarFallback>
 		</Avatar>
 	)
 }
