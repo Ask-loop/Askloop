@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, HttpException } from '@nestjs/common';
 import { GetQuestionsFilterDto, OrderBy, SortBy } from './dto/get-questions-filter.dto';
 import { Question } from './entities/question.entity';
 import { UsersService } from '@modules/users/services';
@@ -100,45 +100,55 @@ export class QuestionsService {
   }
 
   async createQuestion(createQuestionDto: CreateQuestionDto, userId: number) {
-    const user = await this.usersService.findById(userId);
+    try {
+      const user = await this.usersService.findById(userId);
 
-    if (!user) {
-      throw new NotFoundException('User not found');
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      const { title, body, tagIds } = createQuestionDto;
+      const slug = slugify(title, { lower: true, strict: true });
+
+      const existingQuestion = await Question.findOne({ where: { slug } });
+      if (existingQuestion) {
+        throw new BadRequestException('Question with this title already exists');
+      }
+
+      const existingQuestionWithSameTitle = await Question.findOne({ where: { title } });
+      if (existingQuestionWithSameTitle) {
+        throw new BadRequestException('Question with this title already exists');
+      }
+
+      const tags = await this.tagsService.findOrCreateTags(tagIds as string[], userId);
+
+      await Promise.all(
+        tags.map(tag => {
+          tag.usageCount = (tag.usageCount || 0) + 1;
+          return tag.save();
+        }),
+      );
+
+      const question = await Question.create({
+        title,
+        body,
+        slug,
+        tags,
+        user,
+      }).save();
+
+      await this.activitiesService.trackActivity(userId, ActivityType.Question, { questionId: question.id, title: question.title });
+
+      return question;
+    } catch (error) {
+      // Log the error for debugging
+      console.error('Error in createQuestion:', error);
+      // Rethrow as HttpException if not already
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new BadRequestException('Failed to create question. Please try again later.');
     }
-
-    const { title, body, tagIds } = createQuestionDto;
-    const slug = slugify(title, { lower: true, strict: true });
-
-    const existingQuestion = await Question.findOne({ where: { slug } });
-    if (existingQuestion) {
-      throw new BadRequestException('Question with this title already exists');
-    }
-
-    const existingQuestionWithSameTitle = await Question.findOne({ where: { title } });
-    if (existingQuestionWithSameTitle) {
-      throw new BadRequestException('Question with this title already exists');
-    }
-
-    const tags = await this.tagsService.findOrCreateTags(tagIds as string[], userId);
-
-    await Promise.all(
-      tags.map(tag => {
-        tag.usageCount = (tag.usageCount || 0) + 1;
-        return tag.save();
-      }),
-    );
-
-    const question = await Question.create({
-      title,
-      body,
-      slug,
-      tags,
-      user,
-    }).save();
-
-    await this.activitiesService.trackActivity(userId, ActivityType.Question, { questionId: question.id, title: question.title });
-
-    return question;
   }
 
   async updateQuestionSlug(question: Question) {

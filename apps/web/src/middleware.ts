@@ -8,8 +8,10 @@ export function middleware(request: NextRequest) {
 	const accessToken = request.cookies.get(Cookies.USER)?.value
 
 	const url = request.nextUrl.clone()
-	const isPublicPage = PUBLIC_ROUTES_VALUES.some(route =>
-		pathname.startsWith(route)
+	const isPublicPage = PUBLIC_ROUTES_VALUES.some(
+		route =>
+			pathname.startsWith(route) ||
+			PUBLIC_ROUTES_VALUES.includes(pathname)
 	)
 
 	if (!accessToken && !isPublicPage) {

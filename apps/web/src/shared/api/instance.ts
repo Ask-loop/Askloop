@@ -62,7 +62,11 @@ class Instance {
 			_retry?: boolean
 		}
 
-		if (error.response?.status === 401 && !originalRequest._retry) {
+		if (
+			(error.response?.status === 401 ||
+				error.response?.status === 403) &&
+			!originalRequest._retry
+		) {
 			originalRequest._retry = true
 
 			const tokens = await getAuthCookie()

@@ -1,5 +1,5 @@
-import { GetQuestionsReq } from '../types/question'
-import { GetTagsReq } from '../types/tag'
+import { GetTagsReq } from '../types'
+import { GetQuestionsReq } from './question'
 
 export const queryKeys = {
 	questions: (params: GetQuestionsReq) => ['questions', params],

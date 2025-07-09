@@ -13,10 +13,7 @@ export class UsersStatsService {
 
   async initUserStats(userId: number): Promise<UsersStats> {
     return this.connection.transaction(async manager => {
-      const existingStats = await manager.findOne(UsersStats, {
-        where: { user: { id: userId } },
-        lock: { mode: 'pessimistic_write' },
-      });
+      const existingStats = await manager.getRepository(UsersStats).createQueryBuilder('stats').setLock('pessimistic_write').where('stats.userId = :userId', { userId }).getOne();
 
       if (existingStats) return existingStats;
 
@@ -35,10 +32,7 @@ export class UsersStatsService {
 
   async updateStats(userId: number, activityType: ActivityType): Promise<UsersStats> {
     return await this.connection.transaction(async manager => {
-      const stats = await manager.findOne(UsersStats, {
-        where: { user: { id: userId } },
-        lock: { mode: 'pessimistic_write' },
-      });
+      const stats = await manager.getRepository(UsersStats).createQueryBuilder('stats').setLock('pessimistic_write').where('stats.userId = :userId', { userId }).getOne();
 
       if (!stats) throw new NotFoundException('User stats not found');
 

@@ -1,1 +1,1 @@
-export { AskFormInfo } from './AskFormInfo'
+export { AskFormInfo } from './ui/AskFormInfo'

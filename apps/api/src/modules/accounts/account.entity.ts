@@ -10,7 +10,7 @@ export class Account extends BaseEntity {
   @Column()
   provider: AuthenticationMethod;
 
-  @Column()
+  @Column({ unique: true })
   providerAccountId: string;
 
   @ManyToOne(() => User, user => user.accounts, { onDelete: 'CASCADE' })

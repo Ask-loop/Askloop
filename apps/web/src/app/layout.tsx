@@ -1,7 +1,7 @@
 import { type Metadata } from 'next'
 import React from 'react'
-import './globals.css'
-import { Provider } from './provider'
+import { Providers } from '@/providers/Providers'
+import '@/styles/globals.css'
 
 export const metadata: Metadata = {
 	title: 'AskLoop',
@@ -20,7 +20,7 @@ export default function RootLayout({
 	return (
 		<html lang='en' suppressHydrationWarning>
 			<body>
-				<Provider>{children}</Provider>
+				<Providers>{children}</Providers>
 			</body>
 		</html>
 	)
