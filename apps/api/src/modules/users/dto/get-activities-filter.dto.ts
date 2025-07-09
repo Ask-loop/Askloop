@@ -1,15 +1,14 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsOptional } from 'class-validator';
 import { PaginationOptions } from '@common/dto/pagination.dto';
 import { ActivityType } from '@common/types';
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class GetActivitiesFilterDto extends PaginationOptions {}
 
 export class GetActivitiesByTypeFilterDto extends PaginationOptions {
-  @ApiPropertyOptional()
+  @ApiProperty({ enum: ActivityType })
   @IsOptional()
-  @IsString()
-  type?: ActivityType;
+  type: ActivityType;
 }
 
 export class GetRecentActivitiesFilterDto extends PaginationOptions {}

@@ -1,16 +1,14 @@
 import { Module } from '@nestjs/common';
-import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
-import { UsersStatsService } from './users-stats.service';
+import { UsersController, ActivitiesController } from './controllers';
+import { UsersService, UsersStatsService, ActivitiesService } from './services';
 import { AccountsModule } from '@modules/accounts/accounts.module';
 import { TokensModule } from '@modules/tokens/tokens.module';
 import { RedisModule } from '@modules/redis/redis.module';
-import { ActivitiesModule } from '@modules/activities/activities.module';
 
 @Module({
-  imports: [AccountsModule, TokensModule, RedisModule, ActivitiesModule],
-  controllers: [UsersController],
-  providers: [UsersService, UsersStatsService],
-  exports: [UsersService, UsersStatsService],
+  imports: [AccountsModule, TokensModule, RedisModule],
+  controllers: [UsersController, ActivitiesController],
+  providers: [UsersService, UsersStatsService, ActivitiesService],
+  exports: [UsersService, UsersStatsService, ActivitiesService],
 })
 export class UsersModule {}

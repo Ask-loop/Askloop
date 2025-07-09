@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@modules/users/entities/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
-import { OauthProfile } from '@modules/auth/interfaces/oauth.interface';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { OauthProfile } from '@modules/auth/types/oauth.types';
 import { AccountsService } from '@modules/accounts/accounts.service';
 import { UsersStatsService } from './users-stats.service';
-import { ActivitiesService } from '@modules/activities/activities.service';
+import { ActivitiesService } from './activities.service';
 import { ActivityType } from '@common/types';
 import { FindManyOptions } from 'typeorm';
-import { GetUsersFilterDto, OrderByDate, OrderByUser } from './dto/get-users-filter.dto';
+import { GetUsersFilterDto, OrderByDate, OrderByUser } from '../dto/get-users-filter.dto';
 
 @Injectable()
 export class UsersService {
@@ -71,20 +71,6 @@ export class UsersService {
     return user;
   }
 
-  async getUserActivity(id: number) {
-    if (!id) throw new BadRequestException('User ID is required');
-
-    const user = await User.findOne({ where: { id }, relations: ['questions', 'tags', 'stats', 'activities'] });
-
-    if (!user) throw new NotFoundException('User not found');
-
-    return {
-      questions: user.questions,
-      tags: user.tags,
-      activities: user.activities,
-    };
-  }
-
   async create(dto: CreateUserDto) {
     const user = User.create(dto);
     const savedUser = await user.save();
@@ -113,6 +99,7 @@ export class UsersService {
         provider: true,
         providerId: true,
         picture: true,
+        displayName: true,
         firstName: true,
         lastName: true,
         about: true,
@@ -135,6 +122,7 @@ export class UsersService {
         updatedAt: true,
         firstName: true,
         lastName: true,
+        displayName: true,
         role: true,
         questions: true,
         tags: true,
@@ -149,13 +137,16 @@ export class UsersService {
   }
 
   async createOauthUser(profile: OauthProfile): Promise<User> {
-    const user = await this.create({
+    const user = await User.create({
       email: profile.email,
       provider: profile.provider,
       providerId: profile.providerId,
       picture: profile.avatar,
       emailVerified: true,
-    });
+      displayName: profile.displayName,
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+    }).save();
 
     await this.accountsService.createOAuthUser(profile.provider, profile.providerId, user);
 

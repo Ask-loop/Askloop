@@ -8,7 +8,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AllExceptionsFilter } from '@common/filters';
 import { TransformInterceptor } from '@common/interceptors';
 
-dotenv.config({ path: '.env.development' });
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 (async () => {
   const app = await NestFactory.create(AppModule);
@@ -43,11 +43,10 @@ dotenv.config({ path: '.env.development' });
   );
 
   app.enableCors({
-    origin: configService.get('ALLOWED_ORIGIN'),
+    origin: configService.getOrThrow<string>('ALLOWED_ORIGIN'),
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
-    exposedHeaders: ['Set-Cookie'],
   });
 
   app.useGlobalFilters(new AllExceptionsFilter());

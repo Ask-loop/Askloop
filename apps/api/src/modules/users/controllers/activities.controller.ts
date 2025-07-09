@@ -1,8 +1,8 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ActivitiesService } from './activities.service';
+import { ActivitiesService } from '../services/activities.service';
 import { ActivityType } from '@common/types';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { GetActivitiesByTypeFilterDto, GetActivitiesFilterDto, GetRecentActivitiesFilterDto } from './dto';
+import { GetActivitiesByTypeFilterDto, GetActivitiesFilterDto, GetRecentActivitiesFilterDto } from '../dto';
 
 @Controller('activities')
 @ApiTags('Activities')
@@ -15,9 +15,9 @@ export class ActivitiesController {
     return await this.activitiesService.getUserActivities(userId, query);
   }
 
-  @Get('type/:type')
-  async getActivitiesByType(@Param('type') type: ActivityType, @Query() query: GetActivitiesByTypeFilterDto) {
-    return await this.activitiesService.getActivitiesByType(type, query);
+  @Get('type')
+  async getActivitiesByType(@Query() query: GetActivitiesByTypeFilterDto) {
+    return await this.activitiesService.getActivitiesByType(query);
   }
 
   @Get('recent')

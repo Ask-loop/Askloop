@@ -1,7 +1,7 @@
-import { UsersService } from '@modules/users/users.service';
+import { UsersService } from '@modules/users/services';
 import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
-import { OauthProfile } from './interfaces/oauth.interface';
+import { OauthProfile } from './types/oauth.types';
 import { MailService } from '@modules/mail/mail.service';
 import { AuthenticationMethod } from '@shared/enums';
 import { AccountsService } from '@modules/accounts/accounts.service';
@@ -232,8 +232,6 @@ export class AuthService {
   async callbackOauth(req: Request & { user: { data: SignInResponse } }, res: Response) {
     const { accessToken, refreshToken, user } = req?.user?.data;
 
-    console.log('user', user);
-
     const redirectUrl = this.configService.getOrThrow<string>('ALLOWED_ORIGIN');
 
     const encodedUser = encodeURIComponent(JSON.stringify(user));
@@ -264,8 +262,13 @@ export class AuthService {
       emailVerified: user.emailVerified,
       createdAt: user.createdAt,
       picture: user.picture,
+      displayName: user.displayName,
       firstName: user.firstName,
       lastName: user.lastName,
+      about: user.about,
+      role: user.role,
+      provider: user.provider,
+      providerId: user.providerId,
     };
   }
 }
