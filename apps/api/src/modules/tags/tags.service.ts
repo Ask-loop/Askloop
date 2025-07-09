@@ -3,7 +3,7 @@ import { CreateTagDto } from './dto/create-tag.dto';
 import { Tag } from './entities/tag.entity';
 import { In } from 'typeorm';
 import { GetTagsFilterDto, OrderByTag } from './dto/get-tags-filter.dto';
-import { UsersService } from '@modules/users/users.service';
+import { UsersService } from '@modules/users/services';
 
 @Injectable()
 export class TagsService {
@@ -53,13 +53,12 @@ export class TagsService {
   }
 
   async findTagById(id: number): Promise<Tag> {
-    const tag = await Tag.findOne({
-      where: { id },
-      relations: ['questions', 'user'],
-      order: {
-        questions: { createdAt: 'DESC' },
-      },
-    });
+    const tag = await Tag.createQueryBuilder('tag')
+      .leftJoin('tag.user', 'user')
+      .addSelect(['user.id', 'user.displayName', 'user.picture', 'user.firstName', 'user.lastName', 'tag.createdAt'])
+      .where('tag.id = :id', { id })
+      .getOne();
+
     if (!tag) {
       throw new NotFoundException('Tag not found');
     }
@@ -69,10 +68,7 @@ export class TagsService {
   async getTags(filter: GetTagsFilterDto) {
     const { search, orderByTag = OrderByTag.POPULAR, page = 1, limit = 10 } = filter;
 
-    const query = Tag.createQueryBuilder('tag')
-      .leftJoinAndSelect('tag.questions', 'questions')
-      .leftJoinAndSelect('questions.user', 'user')
-      .leftJoinAndSelect('tag.user', 'tagUser');
+    const query = Tag.createQueryBuilder('tag');
 
     if (search) {
       query.andWhere('tag.name ILIKE :search', { search: `%${search}%` });

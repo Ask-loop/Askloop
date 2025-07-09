@@ -1,12 +1,12 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { GetQuestionsFilterDto, OrderBy, SortBy } from './dto/get-questions-filter.dto';
 import { Question } from './entities/question.entity';
-import { UsersService } from '@modules/users/users.service';
+import { UsersService } from '@modules/users/services';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import slugify from 'slugify';
 import { TagsService } from '@modules/tags/tags.service';
 import { UpdateQuestionDto } from './dto/update-question.dto';
-import { ActivitiesService } from '@modules/activities/activities.service';
+import { ActivitiesService } from '@modules/users/services/activities.service';
 import { ActivityType } from '@common/types';
 
 @Injectable()
@@ -34,7 +34,10 @@ export class QuestionsService {
       throw new BadRequestException('Invalid sort field');
     }
 
-    const query = Question.createQueryBuilder('question').leftJoinAndSelect('question.user', 'user').leftJoinAndSelect('question.tags', 'tags');
+    const query = Question.createQueryBuilder('question')
+      .leftJoin('question.user', 'user')
+      .addSelect(['user.id', 'user.displayName', 'user.picture', 'user.firstName', 'user.lastName'])
+      .leftJoinAndSelect('question.tags', 'tags');
 
     if (search) {
       query.andWhere('question.title ILIKE :search', { search: `%${search}%` });
@@ -67,18 +70,32 @@ export class QuestionsService {
   }
 
   async getQuestionById(id: number) {
-    const question = await Question.findOne({ where: { id }, relations: ['user', 'tags'] });
+    const question = await Question.createQueryBuilder('question')
+      .leftJoin('question.user', 'user')
+      .addSelect(['user.id', 'user.displayName', 'user.picture', 'user.firstName', 'user.lastName'])
+      .leftJoinAndSelect('question.tags', 'tags')
+      .where('question.id = :id', { id })
+      .getOne();
+
     if (!question) {
       throw new NotFoundException('Question not found');
     }
+
     return question;
   }
 
   async getQuestionBySlug(slug: string) {
-    const question = await Question.findOne({ where: { slug }, relations: ['user', 'tags'] });
+    const question = await Question.createQueryBuilder('question')
+      .leftJoin('question.user', 'user')
+      .addSelect(['user.id', 'user.displayName', 'user.picture', 'user.firstName', 'user.lastName'])
+      .leftJoinAndSelect('question.tags', 'tags')
+      .where('question.slug = :slug', { slug })
+      .getOne();
+
     if (!question) {
       throw new NotFoundException('Question not found');
     }
+
     return question;
   }
 

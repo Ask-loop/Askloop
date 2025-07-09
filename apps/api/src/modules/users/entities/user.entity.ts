@@ -4,7 +4,7 @@ import { Account } from '@modules/accounts/account.entity';
 import { Question } from '@modules/questions/entities/question.entity';
 import { Tag } from '@modules/tags/entities/tag.entity';
 import { UsersStats } from './users-stats.entity';
-import { Activity } from '@modules/activities/entities/activity.entity';
+import { Activity } from '@modules/users/entities/activity.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -30,6 +30,9 @@ export class User extends BaseEntity {
   picture: string;
 
   @Column({ nullable: true })
+  displayName: string;
+
+  @Column({ nullable: true })
   firstName: string;
 
   @Column({ nullable: true })
@@ -50,7 +53,7 @@ export class User extends BaseEntity {
   @OneToMany(() => Tag, tag => tag.user)
   tags: Tag[];
 
-  @OneToOne(() => UsersStats, stats => stats.user, { cascade: true, eager: true })
+  @OneToOne(() => UsersStats, stats => stats.user, { onDelete: 'CASCADE' })
   @JoinColumn()
   stats: UsersStats;
 

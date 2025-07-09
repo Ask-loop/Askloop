@@ -1,13 +1,13 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { User } from '@modules/users/entities/user.entity';
-import { UsersService } from './users.service';
+import { ActivitiesService, UsersService } from '../services';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthGuard } from '@modules/auth/guards/auth.guard';
-import { GetUsersFilterDto } from './dto/get-users-filter.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UsersStatsService } from './users-stats.service';
-
+import { GetUsersFilterDto } from '../dto/get-users-filter.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
+import { UsersStatsService } from '../services/users-stats.service';
+import { GetActivitiesFilterDto } from '../dto/get-activities-filter.dto';
 @ApiBearerAuth('JWT-auth')
 @ApiTags('Users')
 @Controller('users')
@@ -15,6 +15,7 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly usersStatsService: UsersStatsService,
+    private readonly activitiesService: ActivitiesService,
   ) {}
 
   @Get()
@@ -38,26 +39,26 @@ export class UsersController {
     return this.usersStatsService.getStats(Number(id));
   }
 
-  @Get(':id/activity')
-  async getUserActivity(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.getUserActivity(Number(id));
-  }
-
   @Get('me/stats')
   @UseGuards(AuthGuard)
   async getMeStats(@Req() req: Request) {
     return this.usersStatsService.getStats(req.user?.id);
   }
 
-  @Get('me/activity')
-  @UseGuards(AuthGuard)
-  async getMeActivity(@Req() req: Request) {
-    return this.usersService.getUserActivity(req.user?.id);
-  }
-
   @Put('me')
   @UseGuards(AuthGuard)
   async updateUser(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(req.user?.id, updateUserDto);
+  }
+
+  @Get(':id/activity')
+  async getUserActivity(@Param('id', ParseIntPipe) id: number, @Query() query: GetActivitiesFilterDto) {
+    return this.activitiesService.getUserActivities(id, query);
+  }
+
+  @Get('me/activity')
+  @UseGuards(AuthGuard)
+  async getMeActivity(@Req() req: Request, @Query() query: GetActivitiesFilterDto) {
+    return this.activitiesService.getUserActivities(req.user?.id, query);
   }
 }

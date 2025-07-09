@@ -1,6 +1,6 @@
 import { MailService } from '@modules/mail/mail.service';
 import { RedisService } from '@modules/redis/redis.service';
-import { UsersService } from '@modules/users/users.service';
+import { UsersService } from '@modules/users/services';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { differenceInHours } from 'date-fns';
@@ -35,7 +35,7 @@ export class CleanupService {
         if (!alreadySent) {
           const verificationKeys = await this.redisService.keys('verification:email:*');
           let verificationToken: string | null = null;
-          
+
           for (const key of verificationKeys) {
             const email = await this.redisService.get(key);
             if (email === user.email) {
@@ -43,7 +43,7 @@ export class CleanupService {
               break;
             }
           }
-          
+
           if (verificationToken) {
             await this.mailService.sendUnverifiedReminderEmail(user.email, verificationToken);
             await this.redisService.set(reminderKey, 'sent', 60 * 60 * 24); // expire in 1 day

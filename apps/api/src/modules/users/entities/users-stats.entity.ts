@@ -6,9 +6,12 @@ export class UsersStats extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { cascade: true, onDelete: 'CASCADE', eager: true })
   @JoinColumn()
   user: User;
+
+  @Column({ unique: true })
+  userId: number;
 
   @Column({ default: 0 })
   questionsCount: number;
@@ -36,6 +39,12 @@ export class UsersStats extends BaseEntity {
 
   @Column({ default: 0 })
   badgeBronze: number;
+
+  @Column({ default: 0 })
+  acceptedAnswersCount: number;
+
+  @Column({ default: 0 })
+  notificationsCount: number;
 
   @UpdateDateColumn()
   lastActiveAt: Date;
