@@ -18,7 +18,7 @@ export const Sidebar = () => {
 			animate={collapsed ? 'closed' : 'open'}
 			variants={sidebarVariants}
 			className={cn(
-				'bg-sidebar sticky top-16 h-[calc(100vh-8rem)] border-r'
+				'bg-sidebar sticky top-16 h-[calc(100vh-4rem)] border-r'
 			)}
 		>
 			<div className='flex flex-1 flex-col gap-4 p-2'>

@@ -18,14 +18,12 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('sign-in')
-  @Throttle({ default: { limit: 5, ttl: 60 } })
   @HttpCode(200)
   async signIn(@Body() authDto: AuthDto) {
     return this.authService.signIn(authDto);
   }
 
   @Post('sign-up')
-  @Throttle({ default: { limit: 3, ttl: 300 } })
   @HttpCode(200)
   @Message('Email verification sent. Please check your email.')
   async signUp(@Body() authDto: AuthDto) {

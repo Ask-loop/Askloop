@@ -15,7 +15,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, AuthenticationMet
       clientID: google.clientId,
       clientSecret: google.clientSecret,
       callbackURL: google.callbackUrl,
-      scope: ['email', 'profile', 'openid'],
+      scope: ['email', 'profile'],
     });
   }
 

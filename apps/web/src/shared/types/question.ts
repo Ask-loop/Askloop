@@ -25,7 +25,9 @@ export const enum QuestionSortBy {
 
 export const enum QuestionOrderBy {
 	NEWEST = 'NEWEST',
-	OLDEST = 'OLDEST'
+	OLDEST = 'OLDEST',
+	MOST_VOTES = 'MOST_VOTES',
+	MOST_ANSWERS = 'MOST_ANSWERS'
 }
 
 export type GetQuestionsReq = Pagination & {

@@ -1,85 +1,119 @@
 import { AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
-import { formatDistanceToNow } from 'date-fns'
 import { motion } from 'framer-motion'
+import { MessageSquare, Eye } from 'lucide-react'
 import Link from 'next/link'
-import React from 'react'
-import { Badge } from '@/shared/shadcn/ui'
+import { formatTimeAgo } from '@/shared/lib/utils'
 import { Avatar } from '@/shared/shadcn/ui/avatar'
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle
-} from '@/shared/shadcn/ui/card'
+import { Badge } from '@/shared/shadcn/ui/badge'
+import { Card } from '@/shared/shadcn/ui/card'
 import { Question } from '@/shared/types/question'
+import { Tag } from '@/shared/types/tag'
 import { MarkdownParser } from '@/shared/ui/MarkdowParser'
 import { ROUTES } from '@/constants'
 
 type QuestionCardProps = {
 	question: Question
+	onTagClick?: (tag: Tag) => void
+	variant?: 'default' | 'compact'
 }
 
-export const QuestionCard = ({ question }: QuestionCardProps) => {
+export const QuestionCard = ({
+	question,
+	onTagClick,
+	variant = 'default'
+}: QuestionCardProps) => {
 	return (
 		<motion.div
-			initial={{ opacity: 0, y: 100 }}
+			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
-			exit={{ opacity: 0, y: -100 }}
-			transition={{ duration: 0.5, ease: 'easeInOut' }}
+			whileHover={{ y: -2 }}
+			transition={{ duration: 0.2 }}
 		>
-			<Card className='overflow-hidden rounded-md'>
-				<CardHeader className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
-					<div className='flex flex-col space-x-3'>
-						<Avatar className='"h-9 w-9 sm:h-10 sm:w-10'>
-							<AvatarImage src={question.user?.picture} />
-							<AvatarFallback>
-								{question.user?.email?.charAt(0)}
-							</AvatarFallback>
-						</Avatar>
-						<div>
-							<p className='line-clamp-1 font-medium'>
-								{question.user?.email}
-							</p>
+			<Card
+				className={`bg-card hover:border-primary/30 overflow-hidden rounded-xl border ${variant === 'compact' ? 'p-4' : 'p-6'}`}
+			>
+				<div className='flex flex-col gap-4'>
+					<div className='flex items-start justify-between gap-3'>
+						<div className='flex items-center gap-3'>
+							<Avatar className='h-8 w-8 sm:h-10 sm:w-10'>
+								<AvatarImage
+									src={
+										question.user?.picture ||
+										'/placeholder.svg'
+									}
+									alt={question.user?.email || 'User'}
+								/>
+								<AvatarFallback className='bg-primary/10 text-primary font-medium'>
+									{question.user?.email
+										?.charAt(0)
+										.toUpperCase()}
+								</AvatarFallback>
+							</Avatar>
 
-							<p className='text-muted-foreground text-xs sm:text-sm'>
-								{formatDistanceToNow(
-									new Date(question.createdAt)
-								)}{' '}
-								ago
-							</p>
+							<div className='min-w-0 flex-1'>
+								<p className='truncate text-sm font-medium'>
+									{question.user?.displayName || 'Anonymous'}
+								</p>
+								<p className='text-muted-foreground text-xs'>
+									{formatTimeAgo(question.createdAt)}
+								</p>
+							</div>
+						</div>
+
+						<div className='flex items-center gap-2'>
+							<Badge
+								variant='secondary'
+								className='gap-1 px-2 py-1 text-xs'
+							>
+								<MessageSquare className='h-3 w-3' />
+								<span>{0}</span>
+							</Badge>
+							{variant !== 'compact' && (
+								<Badge
+									variant='outline'
+									className='gap-1 px-2 py-1 text-xs'
+								>
+									<Eye className='h-3 w-3' />
+									<span>{0}</span>
+								</Badge>
+							)}
 						</div>
 					</div>
-					<Badge
-						variant='outline'
-						className='mt-2 px-2 py-1 sm:mt-0 sm:px-3'
-					>
-						{0} answers
-					</Badge>
-				</CardHeader>
-				<CardContent>
+
 					<Link
 						href={ROUTES.question.replace(':slug', question.slug)}
-						className='line-clamp-1 font-medium'
+						className='group block space-y-2'
 					>
-						{question.title}
+						<h3
+							className={`text-card-foreground group-hover:text-primary font-semibold transition-colors ${variant === 'compact' ? 'line-clamp-1 text-base' : 'line-clamp-2 text-lg'}`}
+						>
+							{question.title}
+						</h3>
+
+						{variant !== 'compact' && (
+							<div className='prose prose-sm dark:prose-invert text-muted-foreground line-clamp-3'>
+								<MarkdownParser markdown={question.body} />
+							</div>
+						)}
 					</Link>
 
-					<div className='prose dark:prose-invert line-clamp-2'>
-						<MarkdownParser markdown={question.body} />
-					</div>
-
-					<div className='mt-3 flex flex-wrap gap-2'>
-						{question.tags?.map(tag => (
-							<Badge
-								key={tag.id}
-								variant='secondary'
-								className='hover:bg-secondary/80 px-2 text-xs sm:px-3 sm:text-sm'
-							>
-								{tag.name}
-							</Badge>
-						))}
-					</div>
-				</CardContent>
+					{question.tags?.length > 0 && (
+						<div className='flex flex-wrap gap-2'>
+							{question.tags.map(tag => (
+								<Badge
+									key={tag.id}
+									variant='destructive'
+									onClick={e => {
+										e.stopPropagation()
+										onTagClick?.(tag)
+									}}
+								>
+									{tag.name}
+								</Badge>
+							))}
+						</div>
+					)}
+				</div>
 			</Card>
 		</motion.div>
 	)

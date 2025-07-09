@@ -8,7 +8,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AllExceptionsFilter } from '@common/filters';
 import { TransformInterceptor } from '@common/interceptors';
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
 
 (async () => {
   const app = await NestFactory.create(AppModule);

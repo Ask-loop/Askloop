@@ -1,5 +1,5 @@
 import { UsersService } from '@modules/users/services';
-import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException, HttpException } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
 import { OauthProfile } from './types/oauth.types';
 import { MailService } from '@modules/mail/mail.service';
@@ -63,30 +63,33 @@ export class AuthService {
   }
 
   async signUp({ email, password }: AuthDto) {
-    const existingUser = await this.usersService.findByEmail(email);
-    if (existingUser) {
-      throw new ConflictException('Email already in use');
+    try {
+      const existingUser = await this.usersService.findByEmail(email);
+      if (existingUser) {
+        throw new ConflictException('Email already in use');
+      }
+
+      const hashedPassword = await hashPassword(password);
+      const verificationToken = await this.tokensService.storeEmailVerificationToken(email);
+
+      const user = await this.usersService.create({
+        email,
+        password: hashedPassword,
+        provider: AuthenticationMethod.EMAIL,
+      });
+
+      await this.accountsService.createEmailUser(user);
+
+      await this.sendVerificationEmail(email, verificationToken);
+    } catch (error) {
+      // Log the error for debugging
+      console.error('Error in signUp:', error);
+      // Rethrow as HttpException if not already
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new BadRequestException('Failed to sign up. Please try again later.');
     }
-
-    const hashedPassword = await hashPassword(password);
-    const verificationToken = await this.tokensService.storeEmailVerificationToken(email);
-
-    const user = await this.usersService.create({
-      email,
-      password: hashedPassword,
-      provider: AuthenticationMethod.EMAIL,
-    });
-
-    await this.accountsService.createEmailUser(user);
-
-    const tokens = await this.tokensService.generateTokens(user.id);
-
-    await this.sendVerificationEmail(email, verificationToken);
-
-    return {
-      ...tokens,
-      user: this.normalizeUser(user),
-    };
   }
 
   async verifyEmail(verificationToken: string) {
@@ -184,17 +187,20 @@ export class AuthService {
 
       if (!user) throw new UnauthorizedException('User not found');
 
-      if (!user.emailVerified) throw new UnauthorizedException('Please verify your email before logging in');
+      // if (!user.emailVerified) {
+      //   const verificationToken = await this.tokensService.storeEmailVerificationToken(user.email);
+
+      //   await this.mailService.sendUnverifiedReminderEmail(user.email, verificationToken);
+
+      //   throw new BadRequestException('Please verify your email before logging in');
+      // }
 
       const tokens = await this.tokensService.generateTokens(user.id);
 
-      return successResponse(
-        {
-          ...tokens,
-          user: this.normalizeUser(user),
-        },
-        'Sign in successful',
-      );
+      return {
+        ...tokens,
+        user: this.normalizeUser(user),
+      };
     }
 
     const existingUser = await this.usersService.findByEmail(profile.email);
@@ -207,36 +213,33 @@ export class AuthService {
 
       const tokens = await this.tokensService.generateTokens(existingUser.id);
 
-      return successResponse(
-        {
-          ...tokens,
-          user: existingUser,
-        },
-        'Sign in successful',
-      );
+      return {
+        ...tokens,
+        user: existingUser,
+      };
     }
 
     const user = await this.usersService.createOauthUser(profile);
 
     const tokens = await this.tokensService.generateTokens(user.id);
 
-    return successResponse(
-      {
-        ...tokens,
-        user,
-      },
-      'Sign in successful',
-    );
+    return {
+      ...tokens,
+      user,
+    };
   }
 
   async callbackOauth(req: Request & { user: { data: SignInResponse } }, res: Response) {
-    const { accessToken, refreshToken, user } = req?.user?.data;
+    const { accessToken, refreshToken, user } = req?.user;
 
     const redirectUrl = this.configService.getOrThrow<string>('ALLOWED_ORIGIN');
 
     const encodedUser = encodeURIComponent(JSON.stringify(user));
 
-    return res.redirect(`${redirectUrl}/oauth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&user=${encodedUser}`);
+    return res.redirect(
+      // prettier-ignore
+      `${redirectUrl}/oauth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&user=${encodedUser}`,
+    );
   }
 
   // --- EMAIL METHODS --- //

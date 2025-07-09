@@ -1,3 +1,5 @@
+import { Tags } from '@/views/Tags'
+
 export default function TagsPage() {
-	return <div>TagsPage</div>
+	return <Tags />
 }

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { getQuestionBySlug } from '@/features/questions/api'
 import { queryKeys } from '@/shared/api/queryKeys'
+import { getQuestionBySlug } from '@/shared/api/question'
 
 export const useQuestion = (slug: string) => {
 	const { data, isLoading } = useQuery({

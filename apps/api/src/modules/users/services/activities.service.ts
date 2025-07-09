@@ -71,30 +71,22 @@ export class ActivitiesService {
   }
 
   async getActivityById(activityId: number): Promise<Activity> {
-    const activity = await this.dataSource.transaction(async manager => {
-      return await manager
-        .createQueryBuilder(Activity, 'activity')
-        .leftJoin('activity.user', 'user')
-        .addSelect(['user.id', 'user.displayName', 'user.picture', 'user.firstName', 'user.lastName'])
-        .where('activity.id = :id', { id: activityId })
-        .getOne();
-    });
+    const activity = await Activity.createQueryBuilder('activity')
+      .leftJoin('activity.user', 'user')
+      .addSelect(['user.id', 'user.displayName', 'user.picture', 'user.firstName', 'user.lastName'])
+      .where('activity.id = :id', { id: activityId })
+      .getOne();
 
     if (!activity) throw new NotFoundException('Activity not found');
     return activity;
   }
 
   async deleteActivity(activityId: number, userId: number): Promise<void> {
-    const activity = await this.dataSource.transaction(async manager => {
-      return await manager.findOne(Activity, {
-        where: { id: activityId, user: { id: userId } },
-      });
+    const result = await this.dataSource.transaction(async manager => {
+      return await manager.delete(Activity, { id: activityId, user: { id: userId } });
     });
-
-    if (!activity) throw new NotFoundException('Activity not found');
-
-    await this.dataSource.transaction(async manager => {
-      await manager.delete(Activity, activity);
-    });
+    if (result.affected === 0) {
+      throw new NotFoundException('Activity not found');
+    }
   }
 }

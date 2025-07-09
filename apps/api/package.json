@@ -4,6 +4,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "build": "nest build",
+    "start:debug": "nest start --debug --watch",
     "migration:generate": "typeorm migration:generate src/database/migrations/migrations -d dist/src/database/data-source.js",
     "migration:run": "typeorm migration:run -d dist/src/database/data-source.js",
     "migration:revert": "typeorm migration:revert -d dist/src/database/data-source.js",

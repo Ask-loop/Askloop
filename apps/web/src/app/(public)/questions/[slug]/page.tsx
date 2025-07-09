@@ -1,4 +1,4 @@
-import { QuestionDetail } from '@/widgets/QuestionDetail/QuestionDetail'
+import { QuestionDetail } from '@/views/questions'
 
 export const generateMetadata = async ({
 	params
