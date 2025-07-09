@@ -7,5 +7,12 @@ export const questionsDictionary = {
 	findAnswers: 'Find answers to your programming questions',
 	filterBy: 'Filter by',
 	noQuestions: 'No questions found',
-	popularTags: 'Popular Tags'
+	popularTags: 'Popular Tags',
+	askQuestion: 'Ask Question',
+	needHelp: 'Need Help?',
+	needHelpDescription:
+		'Have a question or facing an issue? Ask the community!',
+	checkOutOurGuides:
+		'Check out our comprehensive guides on how to get the most from AskLoop.',
+	visitHelpCenter: 'Visit Help Center'
 }

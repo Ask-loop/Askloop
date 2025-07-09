@@ -3,10 +3,13 @@ export const PUBLIC_ROUTES = {
 	signIn: '/sign-in',
 	signUp: '/sign-up',
 	resetPassword: '/reset-password',
-	questions: '/questions',
+	explore: '/explore',
 	question: '/questions/:slug',
 	tags: '/tags',
-	users: '/users'
+	users: '/users',
+	badges: '/badges',
+	leaderboard: '/leaderboard',
+	discussions: '/discussions'
 }
 
 export const PROTECTED_ROUTES = {

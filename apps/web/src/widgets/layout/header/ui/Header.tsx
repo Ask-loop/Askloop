@@ -6,6 +6,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { useAuthStore } from '@/features/auth/model/auth.store'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/shadcn/ui/avatar'
 import { Button } from '@/shared/shadcn/ui/button'
+import { Container } from '@/shared/shadcn/ui/container'
 import { Input } from '@/shared/shadcn/ui/input'
 import { AskLoopLogo } from '@/shared/ui/Logo'
 import { ROUTES } from '@/constants/routes'
@@ -20,8 +21,8 @@ export const Header = () => {
 	)
 
 	return (
-		<header className='bg-background sticky top-0 z-10 h-16 border-b px-4 py-2'>
-			<div className='flex items-center justify-between'>
+		<header className='dark:bg-primary-dark sticky top-0 z-10 h-16 border-b bg-white'>
+			<Container className='flex h-full items-center justify-between'>
 				<div className='flex items-center gap-4'>
 					<AskLoopLogo />
 
@@ -38,8 +39,8 @@ export const Header = () => {
 						<>
 							<Link href={ROUTES.ask}>
 								<Button
-									variant='outline'
-									className='hidden rounded-full sm:inline-flex'
+									variant='default'
+									className='hidden sm:inline-flex'
 								>
 									<PlusIcon className='mr-1 h-4 w-4' />
 									<span>Ask Question</span>
@@ -72,7 +73,7 @@ export const Header = () => {
 						</>
 					)}
 				</div>
-			</div>
+			</Container>
 		</header>
 	)
 }
