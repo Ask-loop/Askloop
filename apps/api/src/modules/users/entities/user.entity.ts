@@ -5,6 +5,7 @@ import { Question } from '@modules/questions/entities/question.entity';
 import { Tag } from '@modules/tags/entities/tag.entity';
 import { UsersStats } from './users-stats.entity';
 import { Activity } from '@modules/users/entities/activity.entity';
+import { QuestionVote } from '@modules/questions/entities/question-vote.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -49,6 +50,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Question, question => question.user)
   questions: Question[];
+
+  @OneToMany(() => QuestionVote, vote => vote.user)
+  questionVotes: QuestionVote[];
 
   @OneToMany(() => Tag, tag => tag.user)
   tags: Tag[];

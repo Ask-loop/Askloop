@@ -28,4 +28,20 @@ export class RedisService {
   async flushall(): Promise<void> {
     await this.redisClient.flushall();
   }
+
+  async delMany(keys: string[]): Promise<void> {
+    await Promise.all(keys.map(key => this.del(key)));
+  }
+
+  async setMany(keys: string[], values: string[], ttl: number): Promise<void> {
+    await Promise.all(keys.map((key, index) => this.set(key, values[index], ttl)));
+  }
+
+  async incrBy(key: string, value: number): Promise<number> {
+    return this.redisClient.incrby(key, value);
+  }
+
+  async decrBy(key: string, value: number): Promise<number> {
+    return this.redisClient.decrby(key, value);
+  }
 }

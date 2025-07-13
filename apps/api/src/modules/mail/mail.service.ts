@@ -23,12 +23,13 @@ export class MailService {
     });
   }
 
-  async sendEmail(to: string, subject: string, html: string) {
+  async sendEmail(to: string, subject: string, html: string, data: Record<string, any> = {}) {
     const info = await this.transporter.sendMail({
       from: 'oyatilloabdushkurov120@gmail.com',
       to,
       subject,
-      html: html,
+      html,
+      ...data,
     });
 
     this.logger.log(`Email sent: ${info.messageId}`);

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { FaArrowUp, FaEye } from 'react-icons/fa'
+import { getPlainText } from '@/shared/lib/getPlainText'
 import { formatTimeAgo } from '@/shared/lib/utils'
 import { Button } from '@/shared/shadcn/ui'
 import { Card, CardContent, CardFooter } from '@/shared/shadcn/ui/card'
@@ -30,13 +31,14 @@ export const QuestionCard = ({ question, onTagClick }: QuestionCardProps) => {
 
 					<div className='text-muted-foreground flex items-center gap-1 text-xs sm:text-sm'>
 						<FaEye className='size-3 sm:size-4' />
-						<span>12</span>
+						<span>{question.views}</span>
 					</div>
 				</div>
 
-				<div className='line-clamp-2 max-w-prose text-sm sm:text-base'>
-					<MarkdownParser markdown={question.body} />
-				</div>
+				<MarkdownParser
+					className='line-clamp-2 max-w-prose'
+					markdown={getPlainText(question.body)}
+				/>
 
 				<div className='flex flex-wrap gap-1 sm:gap-2'>
 					{question.tags.map(tag => (
@@ -72,7 +74,7 @@ export const QuestionCard = ({ question, onTagClick }: QuestionCardProps) => {
 
 				<div className='text-muted-foreground flex items-center gap-1 text-xs sm:text-sm'>
 					<FaArrowUp className='size-3 sm:size-4' />
-					<span>12</span>
+					<span>{question.answersCount}</span>
 				</div>
 			</CardFooter>
 		</Card>

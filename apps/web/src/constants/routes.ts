@@ -9,7 +9,8 @@ export const PUBLIC_ROUTES = {
 	users: '/users',
 	badges: '/badges',
 	leaderboard: '/leaderboard',
-	discussions: '/discussions'
+	discussions: '/discussions',
+	search: '/search'
 }
 
 export const PROTECTED_ROUTES = {

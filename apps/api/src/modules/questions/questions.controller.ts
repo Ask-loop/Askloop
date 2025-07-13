@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { QuestionsService } from './questions.service';
 import { GetQuestionsFilterDto } from './dto/get-questions-filter.dto';
 import { CreateQuestionDto } from './dto/create-question.dto';
@@ -6,12 +6,17 @@ import { UpdateQuestionDto } from './dto/update-question.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@modules/auth/guards/auth.guard';
 import { Request } from 'express';
+import { QuestionVoteService } from './services/question-vote.service';
+import { VoteQuestionDto } from './dto/vote-question.dto';
 
 @ApiBearerAuth('JWT-auth')
 @ApiTags('Questions')
 @Controller('questions')
 export class QuestionsController {
-  constructor(private readonly questionsService: QuestionsService) {}
+  constructor(
+    private readonly questionsService: QuestionsService,
+    private readonly questionVoteService: QuestionVoteService,
+  ) {}
 
   @Get()
   getQuestions(@Query() filter: GetQuestionsFilterDto) {
@@ -24,8 +29,14 @@ export class QuestionsController {
   }
 
   @Get('slug/:slug')
-  getQuestionBySlug(@Param('slug') slug: string) {
-    return this.questionsService.getQuestionBySlug(slug);
+  getQuestionBySlug(@Param('slug') slug: string, @Req() req: Request) {
+    return this.questionsService.getQuestionBySlug(slug, req?.ip || req?.headers['x-forwarded-for'] || req?.headers['x-real-ip']);
+  }
+
+  @Post(':id/vote')
+  @UseGuards(AuthGuard)
+  voteQuestion(@Param('id', ParseIntPipe) id: number, @Req() req: Request, @Body() voteQuestionDto: VoteQuestionDto) {
+    return this.questionVoteService.vote(id, req?.user?.id, voteQuestionDto.vote);
   }
 
   @Post()

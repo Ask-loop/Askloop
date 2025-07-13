@@ -65,7 +65,8 @@ class Instance {
 		if (
 			(error.response?.status === 401 ||
 				error.response?.status === 403) &&
-			!originalRequest._retry
+			!originalRequest._retry &&
+			originalRequest.url !== AuthEndpoints.SignOut
 		) {
 			originalRequest._retry = true
 
@@ -80,15 +81,20 @@ class Instance {
 			if (this.isRefreshing) {
 				return new Promise((resolve, reject) => {
 					this.refreshQueue.push({ resolve, reject })
-				}).then((token: unknown) => {
-					if (token) {
-						originalRequest.headers = {
-							...originalRequest.headers,
-							Authorization: `Bearer ${token}`
-						}
-						return this.instance(originalRequest)
-					}
 				})
+					.then((token: unknown) => {
+						if (token) {
+							originalRequest.headers = {
+								...originalRequest.headers,
+								Authorization: `Bearer ${token}`
+							}
+							return this.instance(originalRequest)
+						}
+						throw error
+					})
+					.catch(err => {
+						return Promise.reject(err)
+					})
 			}
 
 			this.isRefreshing = true
@@ -146,19 +152,38 @@ class Instance {
 				refreshToken: string
 				user: User
 			}>
-		>('/auth/refresh-tokens', { refreshToken })
+		>(`${AuthEndpoints.RefreshTokens}`, { refreshToken })
 
 		return response.data
 	}
 
 	private async logout() {
-		await clearAuthCookie()
-		await this.instance.post(AuthEndpoints.SignOut)
-		useAuthStore.getState().signOut()
+		const tokens = await getAuthCookie()
+		const accessToken = tokens?.accessToken
 
-		if (typeof window !== 'undefined') {
-			toastCatchError('Session expired. Please sign in again.')
-			window.location.replace(ROUTES.signIn)
+		try {
+			await clearAuthCookie()
+
+			useAuthStore.getState().signOut()
+
+			if (typeof window !== 'undefined') {
+				toastCatchError('Session expired. Please sign in again.')
+				window.location.replace(ROUTES.signIn)
+			}
+
+			await axios.post(
+				`${process.env.NEXT_PUBLIC_API_URL}${AuthEndpoints.SignOut}`,
+				null,
+				{
+					withCredentials: true,
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${accessToken}`
+					}
+				}
+			)
+		} catch (error) {
+			toastCatchError(error)
 		}
 	}
 

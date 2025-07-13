@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
-import { AuthDto, VerifyEmailDto, RefreshTokenDto, RequestPasswordResetDto, ResetPasswordDto, ChangePasswordDto } from './dto/auth.dto';
+import { AuthDto, VerifyEmailDto, RefreshTokenDto, RequestPasswordResetDto, ResetPasswordDto, ChangePasswordDto, SignUpDto } from './dto/auth.dto';
 import { GoogleOAuthGuard } from './guards/google.guard';
 import { Response } from 'express';
 import { AuthGuard } from './guards/auth.guard';
@@ -26,11 +26,12 @@ export class AuthController {
   @Post('sign-up')
   @HttpCode(200)
   @Message('Email verification sent. Please check your email.')
-  async signUp(@Body() authDto: AuthDto) {
-    return this.authService.signUp(authDto);
+  async signUp(@Body() signUpDto: SignUpDto) {
+    return this.authService.signUp(signUpDto);
   }
 
   @Post('verify-email')
+  @Message('Email verified successfully')
   @HttpCode(200)
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
     return this.authService.verifyEmail(verifyEmailDto.verificationToken);

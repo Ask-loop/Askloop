@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
 import { comparePasswords, hashPassword } from '@shared/utils/password';
+import { UsersService } from '@modules/users/services';
 
 @Injectable()
 export class TokensService {
@@ -14,6 +15,7 @@ export class TokensService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly redisService: RedisService,
+    private readonly usersService: UsersService,
   ) {}
 
   private get accessSecret() {
@@ -45,8 +47,19 @@ export class TokensService {
   async generateTokens(userId: number) {
     const rotationId = uuidv4();
 
+    // Get user information for JWT payload
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
     const accessToken = await this.jwt.signAsync(
-      { sub: userId, type: 'access' },
+      {
+        sub: userId,
+        type: 'access',
+        email: user.email,
+        displayName: user.displayName,
+      },
       {
         secret: this.accessSecret,
         expiresIn: this.accessExpiresIn,
@@ -129,6 +142,58 @@ export class TokensService {
   async revokeRefreshToken(userId: number, rotationId: string) {
     const redisKey = `refresh_token:${userId}:${rotationId}`;
     await this.redisService.del(redisKey);
+  }
+
+  async blacklistAccessToken(userId: number) {
+    const accessTokenKey = `access_token:${userId}`;
+    const blacklistKey = `blacklist:access_token:${userId}`;
+
+    const currentToken = await this.redisService.get(accessTokenKey);
+    if (currentToken) {
+      await this.redisService.set(blacklistKey, currentToken, this.accessExpiresIn);
+      await this.redisService.del(accessTokenKey);
+    }
+  }
+
+  async isAccessTokenBlacklisted(userId: number, token: string): Promise<boolean> {
+    const blacklistKey = `blacklist:access_token:${userId}`;
+    const blacklistedToken = await this.redisService.get(blacklistKey);
+    return blacklistedToken === token;
+  }
+
+  async validateAccessToken(token: string): Promise<{ userId: number; isValid: boolean }> {
+    try {
+      const userId = await this.decodeAccessToken(token);
+      const isBlacklisted = await this.isAccessTokenBlacklisted(userId, token);
+
+      return { userId, isValid: !isBlacklisted };
+    } catch {
+      return { userId: 0, isValid: false };
+    }
+  }
+
+  async getTokenInfo(userId: number): Promise<{
+    hasActiveToken: boolean;
+    isBlacklisted: boolean;
+    tokenExpiry?: number;
+  }> {
+    const accessTokenKey = `access_token:${userId}`;
+    const blacklistKey = `blacklist:access_token:${userId}`;
+
+    const [activeToken, blacklistedToken] = await Promise.all([this.redisService.get(accessTokenKey), this.redisService.get(blacklistKey)]);
+
+    return {
+      hasActiveToken: !!activeToken,
+      isBlacklisted: !!blacklistedToken,
+      tokenExpiry: activeToken ? this.accessExpiresIn : undefined,
+    };
+  }
+
+  async cleanupExpiredTokens(): Promise<void> {
+    const blacklistedKeys = await this.redisService.keys('blacklist:access_token:*');
+    const activeTokenKeys = await this.redisService.keys('access_token:*');
+
+    console.log(`Cleanup: ${blacklistedKeys.length} blacklisted tokens, ${activeTokenKeys.length} active tokens`);
   }
 
   async storeEmailVerificationToken(email: string) {

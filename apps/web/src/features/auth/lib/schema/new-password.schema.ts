@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { passwordRegex } from '../regex'
+import { PASSWORD_REGEX } from '../regex'
 
 export const newPasswordSchema = z.object({
 	newPassword: z
 		.string()
-		.regex(passwordRegex, 'Invalid password')
+		.regex(PASSWORD_REGEX, 'Invalid password')
 		.min(1, 'Password is required')
 })
 

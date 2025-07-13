@@ -11,7 +11,8 @@ import {
 import { clearAuthCookie, setAuthCookie } from '@/features/auth/lib'
 import {
 	AuthSchemaType,
-	ResetPasswordSchemaType
+	ResetPasswordSchemaType,
+	SignUpSchemaType
 } from '@/features/auth/lib/schema'
 import { useAuthStore } from '@/features/auth/model/auth.store'
 import { ResetPasswordReq, VerifyEmailReq } from '@/features/auth/types'
@@ -44,7 +45,7 @@ export const useSignIn = () => {
 
 export const useSignUp = () => {
 	const { mutate: signUpMutation, isPending } = useMutation({
-		mutationFn: (params: AuthSchemaType) => signUp(params),
+		mutationFn: (params: SignUpSchemaType) => signUp(params),
 		onSuccess: response => {
 			toastSuccess(response?.message)
 		},
@@ -61,10 +62,6 @@ export const useVerifyEmail = () => {
 
 	const { mutate: verifyEmailMutation } = useMutation({
 		mutationFn: (params: VerifyEmailReq) => verifyEmail(params),
-		onSuccess: response => {
-			toastSuccess(response?.message)
-			router.push(ROUTES.home)
-		},
 		onError: error => {
 			router.push(ROUTES.signIn)
 			toastCatchError(error)

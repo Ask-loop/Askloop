@@ -10,7 +10,7 @@ import {
 } from '@/shared/form-controls'
 import { Spinner } from '@/shared/shadcn/ui'
 import { Button } from '@/shared/shadcn/ui/button'
-import { authSchema, AuthSchemaType } from '../lib'
+import { signUpSchema, SignUpSchemaType } from '../lib'
 import { useSignUp } from '../model/hooks'
 import { AuthWrapper } from './AuthWrapper'
 import { ROUTES } from '@/constants'
@@ -19,16 +19,18 @@ import dictionary from '@/dictionary/en'
 export const RegisterForm = () => {
 	const methods = useForm({
 		mode: 'onChange',
-		resolver: zodResolver(authSchema),
+		resolver: zodResolver(signUpSchema),
 		defaultValues: {
+			displayName: '',
 			email: '',
-			password: ''
+			password: '',
+			confirmPassword: ''
 		}
 	})
 
 	const { signUpMutation, isPending } = useSignUp()
 
-	const onSubmit = (data: AuthSchemaType) => {
+	const onSubmit = (data: SignUpSchemaType) => {
 		signUpMutation(data)
 	}
 
@@ -47,6 +49,12 @@ export const RegisterForm = () => {
 				onSubmit={onSubmit}
 			>
 				<RHFInput
+					name='displayName'
+					label='Display name'
+					placeholder='Your display name'
+				/>
+
+				<RHFInput
 					name='email'
 					label='Email address'
 					placeholder='your@email.com'
@@ -58,12 +66,19 @@ export const RegisterForm = () => {
 					placeholder='••••••••'
 				/>
 
+				<RHFInputPassword
+					name='confirmPassword'
+					label='Confirm password'
+					placeholder='••••••••'
+				/>
+
 				<Button
 					type='submit'
 					className='group w-full'
 					disabled={!methods.formState.isValid || isPending}
+					isLoading={isPending}
 				>
-					{isPending ? <Spinner /> : dictionary.signUp}
+					{dictionary.signUp}
 					<ArrowRight className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-1' />
 				</Button>
 			</FormProvider>

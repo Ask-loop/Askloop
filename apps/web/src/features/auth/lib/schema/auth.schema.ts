@@ -1,14 +1,14 @@
 import { z } from 'zod'
-import { emailRegex, passwordRegex } from '../regex'
+import { EMAIL_REGEX, PASSWORD_REGEX } from '../regex'
 
 export const authSchema = z.object({
 	email: z
 		.string()
-		.regex(emailRegex, 'Invalid email address')
+		.regex(EMAIL_REGEX, 'Invalid email address')
 		.min(1, 'Email is required'),
 	password: z
 		.string()
-		.regex(passwordRegex, 'Invalid password')
+		.regex(PASSWORD_REGEX, 'Invalid password')
 		.min(1, 'Password is required')
 })
 

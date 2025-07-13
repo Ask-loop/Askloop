@@ -78,14 +78,12 @@ export const AskForm = () => {
 							Include all the information someone would need to
 							answer your question
 						</FormDescription>
-						<FormControl>
-							<MarkdownEditor
-								placeholder='Write your question here...'
-								value={field.value || ''}
-								onChange={field.onChange}
-							/>
-						</FormControl>
-						<FormMessage />
+						<MarkdownEditor
+							placeholder='Write your question here...'
+							value={field.value || ''}
+							onChange={field.onChange}
+							error={form.formState.errors.body?.message}
+						/>
 					</FormItem>
 				)}
 			/>
@@ -100,16 +98,14 @@ export const AskForm = () => {
 							Add up to 5 tags to describe what your question is
 							about
 						</FormDescription>
-						<FormControl>
-							<TagInput
-								value={field.value}
-								onChange={field.onChange}
-								options={tags || []}
-								onSearchChange={setDebouncedSearch}
-								maxTags={5}
-							/>
-						</FormControl>
-						<FormMessage />
+						<TagInput
+							value={field.value}
+							onChange={field.onChange}
+							options={tags || []}
+							onSearchChange={setDebouncedSearch}
+							maxTags={5}
+							error={form.formState.errors.tagIds?.message}
+						/>
 					</FormItem>
 				)}
 			/>

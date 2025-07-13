@@ -193,3 +193,7 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+.w-md-editor-toolbar {
+	@apply bg-secondary! dark:bg-input/30 border-input border px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none;
+}

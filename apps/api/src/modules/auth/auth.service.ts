@@ -1,6 +1,6 @@
 import { UsersService } from '@modules/users/services';
 import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException, HttpException } from '@nestjs/common';
-import { AuthDto } from './dto/auth.dto';
+import { AuthDto, SignUpDto } from './dto/auth.dto';
 import { OauthProfile } from './types/oauth.types';
 import { MailService } from '@modules/mail/mail.service';
 import { AuthenticationMethod } from '@shared/enums';
@@ -62,34 +62,26 @@ export class AuthService {
     };
   }
 
-  async signUp({ email, password }: AuthDto) {
-    try {
-      const existingUser = await this.usersService.findByEmail(email);
-      if (existingUser) {
-        throw new ConflictException('Email already in use');
-      }
+  async signUp(dto: SignUpDto) {
+    const existingUser = await this.usersService.findByEmail(dto.email);
 
-      const hashedPassword = await hashPassword(password);
-      const verificationToken = await this.tokensService.storeEmailVerificationToken(email);
-
-      const user = await this.usersService.create({
-        email,
-        password: hashedPassword,
-        provider: AuthenticationMethod.EMAIL,
-      });
-
-      await this.accountsService.createEmailUser(user);
-
-      await this.sendVerificationEmail(email, verificationToken);
-    } catch (error) {
-      // Log the error for debugging
-      console.error('Error in signUp:', error);
-      // Rethrow as HttpException if not already
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw new BadRequestException('Failed to sign up. Please try again later.');
+    if (existingUser) {
+      throw new ConflictException('Email already in use');
     }
+
+    const hashedPassword = await hashPassword(dto.password);
+    const verificationToken = await this.tokensService.storeEmailVerificationToken(dto.email);
+
+    const user = await this.usersService.create({
+      email: dto.email,
+      displayName: dto.displayName,
+      password: hashedPassword,
+      provider: AuthenticationMethod.EMAIL,
+    });
+
+    await this.accountsService.createEmailUser(user);
+
+    await this.sendVerificationEmail(dto.email, verificationToken);
   }
 
   async verifyEmail(verificationToken: string) {
@@ -102,10 +94,18 @@ export class AuthService {
     if (user.emailVerified) throw new BadRequestException('Email already verified');
 
     await this.usersService.update(user.id, { emailVerified: true });
+
+    const tokens = await this.tokensService.generateTokens(user.id);
+
+    return {
+      ...tokens,
+      user: this.normalizeUser(user),
+    };
   }
 
   async signOut(userId: number) {
     await this.tokensService.revokeAllRefreshTokens(userId);
+    await this.tokensService.blacklistAccessToken(userId);
   }
 
   async requestPasswordReset(email: string) {

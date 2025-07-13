@@ -1,13 +1,14 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException, HttpException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { GetQuestionsFilterDto, OrderBy, SortBy } from './dto/get-questions-filter.dto';
 import { Question } from './entities/question.entity';
 import { UsersService } from '@modules/users/services';
 import { CreateQuestionDto } from './dto/create-question.dto';
-import slugify from 'slugify';
 import { TagsService } from '@modules/tags/tags.service';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { ActivitiesService } from '@modules/users/services/activities.service';
 import { ActivityType } from '@common/types';
+import { RedisService } from '@modules/redis/redis.service';
+import { QuestionVoteService } from './services/question-vote.service';
 
 @Injectable()
 export class QuestionsService {
@@ -15,6 +16,8 @@ export class QuestionsService {
     private readonly usersService: UsersService,
     private readonly tagsService: TagsService,
     private readonly activitiesService: ActivitiesService,
+    private readonly redisService: RedisService,
+    private readonly questionVoteService: QuestionVoteService,
   ) {}
 
   async getQuestions(filter: GetQuestionsFilterDto) {
@@ -54,7 +57,7 @@ export class QuestionsService {
     }
 
     if (tagIds?.length) {
-      query.andWhere('tag.id IN (:...tagIds)', { tagIds });
+      query.andWhere('tags.id IN (:...tagIds)', { tagIds });
     }
 
     query.orderBy(`question.${sortBy}`, orderBy === OrderBy.NEWEST ? 'DESC' : 'ASC');
@@ -84,7 +87,7 @@ export class QuestionsService {
     return question;
   }
 
-  async getQuestionBySlug(slug: string) {
+  async getQuestionBySlug(slug: string, ip: string) {
     const question = await Question.createQueryBuilder('question')
       .leftJoin('question.user', 'user')
       .addSelect(['user.id', 'user.displayName', 'user.picture', 'user.firstName', 'user.lastName'])
@@ -94,6 +97,15 @@ export class QuestionsService {
 
     if (!question) {
       throw new NotFoundException('Question not found');
+    }
+
+    const key = `question:viewed:${slug}:${ip}`;
+
+    const alreadyViewed = await this.redisService.get(key);
+
+    if (!alreadyViewed) {
+      await this.redisService.set(key, 'true', 3600);
+      await this.incrementViews(question.id);
     }
 
     return question;
@@ -108,12 +120,6 @@ export class QuestionsService {
       }
 
       const { title, body, tagIds } = createQuestionDto;
-      const slug = slugify(title, { lower: true, strict: true });
-
-      const existingQuestion = await Question.findOne({ where: { slug } });
-      if (existingQuestion) {
-        throw new BadRequestException('Question with this title already exists');
-      }
 
       const existingQuestionWithSameTitle = await Question.findOne({ where: { title } });
       if (existingQuestionWithSameTitle) {
@@ -132,7 +138,6 @@ export class QuestionsService {
       const question = await Question.create({
         title,
         body,
-        slug,
         tags,
         user,
       }).save();
@@ -141,20 +146,11 @@ export class QuestionsService {
 
       return question;
     } catch (error) {
-      // Log the error for debugging
-      console.error('Error in createQuestion:', error);
-      // Rethrow as HttpException if not already
       if (error instanceof HttpException) {
         throw error;
       }
       throw new BadRequestException('Failed to create question. Please try again later.');
     }
-  }
-
-  async updateQuestionSlug(question: Question) {
-    const slug = slugify(question.title, { lower: true, strict: true });
-    question.slug = slug;
-    return question.save();
   }
 
   async updateQuestion(id: number, updateQuestionDto: UpdateQuestionDto, userId: number) {
@@ -171,7 +167,6 @@ export class QuestionsService {
 
     if (title) {
       question.title = title;
-      await this.updateQuestionSlug(question);
     }
 
     if (body) {
@@ -197,6 +192,18 @@ export class QuestionsService {
     await this.activitiesService.trackActivity(question.user.id, ActivityType.Delete, { questionId: question.id, title: question.title });
 
     await question.remove();
+    return question;
+  }
+
+  async incrementViews(id: number) {
+    const question = await Question.findOne({ where: { id } });
+    if (!question) {
+      throw new NotFoundException('Question not found');
+    }
+
+    question.views++;
+    await question.save();
+
     return question;
   }
 }
