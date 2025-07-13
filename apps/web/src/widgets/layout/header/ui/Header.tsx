@@ -1,13 +1,12 @@
 'use client'
 
-import { BellIcon, PlusIcon, SearchIcon } from 'lucide-react'
+import { BellIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useShallow } from 'zustand/react/shallow'
 import { useAuthStore } from '@/features/auth/model/auth.store'
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/shadcn/ui/avatar'
+import { Input } from '@/shared/shadcn/ui'
 import { Button } from '@/shared/shadcn/ui/button'
 import { Container } from '@/shared/shadcn/ui/container'
-import { Input } from '@/shared/shadcn/ui/input'
 import { AskLoopLogo } from '@/shared/ui/Logo'
 import { ROUTES } from '@/constants/routes'
 import { UserMenu } from '@/entities/user/ui'
@@ -27,10 +26,8 @@ export const Header = () => {
 					<AskLoopLogo />
 
 					<Input
-						icon={<SearchIcon className='h-4 w-4' />}
-						type='text'
-						placeholder='Search in AskLoop'
 						className='hidden w-96 md:block'
+						placeholder='Search in AskLoop'
 					/>
 				</div>
 

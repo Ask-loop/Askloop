@@ -23,7 +23,7 @@
       "@common/*": ["./src/common/*"],
       "@shared/*": ["./src/shared/*"],
       "@sockets/*": ["./src/sockets/*"],
-      "@config/*": ["./src/config/*"],
+      "@config/*": ["src/config/*"],
       "@database/*": ["./src/database/*"]
     }
   }

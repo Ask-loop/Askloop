@@ -1,22 +1,43 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect } from 'react'
 import { Spinner } from '@/shared/shadcn/ui'
+import { toastSuccess } from '@/shared/utils/toast-message-handler'
+import { setAuthCookie } from '../lib'
+import { useAuthStore } from '../model/auth.store'
 import { useVerifyEmail } from '../model/hooks'
 import { AuthWrapper } from './AuthWrapper'
+import { ROUTES } from '@/constants'
 import dictionary from '@/dictionary/en'
 
 export const VerifyEmail = () => {
 	const searchParams = useSearchParams()
 	const verificationToken = searchParams.get('token') ?? ''
-
+	const setUser = useAuthStore(state => state.setUser)
+	const router = useRouter()
 	const { verifyEmailMutation } = useVerifyEmail()
 
 	useEffect(() => {
-		verifyEmailMutation({
-			verificationToken
-		})
+		verifyEmailMutation(
+			{
+				verificationToken
+			},
+			{
+				onSuccess: async response => {
+					await setAuthCookie({
+						accessToken: response.data.accessToken,
+						refreshToken: response.data.refreshToken
+					})
+
+					setUser(response.data.user)
+
+					toastSuccess(response.message)
+
+					router.push(ROUTES.home)
+				}
+			}
+		)
 	}, [verificationToken])
 
 	return (

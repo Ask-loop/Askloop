@@ -1,8 +1,12 @@
 import { AuthenticationMethod } from '@shared/enums';
-import { IsArray, IsBoolean, IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Account } from '@modules/accounts/account.entity';
 
 export class CreateUserDto {
+  @IsString()
+  @IsNotEmpty()
+  displayName: string;
+
   @IsBoolean()
   @IsOptional()
   emailVerified?: boolean;

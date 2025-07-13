@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { getPlainText, hasTextBeforeCode } from '@/shared/lib/getPlainText'
 
 export const askQuestionSchema = z.object({
 	title: z
@@ -7,8 +8,14 @@ export const askQuestionSchema = z.object({
 		.max(100, 'Title must be less than 100 characters'),
 	body: z
 		.string()
-		.min(20, 'Description must be at least 20 characters')
-		.max(1000, 'Description must be less than 1000 characters'),
+		.refine(value => {
+			const plainText = getPlainText(value)
+			return plainText.length >= 150
+		}, 'Body must be at least 150 characters')
+		.refine(
+			value => hasTextBeforeCode(value),
+			'Body must contain text before code blocks'
+		),
 	tagIds: z
 		.array(z.string())
 		.min(1, 'Select at least 1 tag')

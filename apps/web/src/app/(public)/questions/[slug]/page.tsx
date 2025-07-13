@@ -1,4 +1,4 @@
-import { QuestionDetail } from '@/views/questions'
+import { ViewQuestion } from '@/views/questions'
 
 export const generateMetadata = async ({
 	params
@@ -20,5 +20,5 @@ export const generateMetadata = async ({
 }
 
 export default function QuestionPage() {
-	return <QuestionDetail />
+	return <ViewQuestion />
 }

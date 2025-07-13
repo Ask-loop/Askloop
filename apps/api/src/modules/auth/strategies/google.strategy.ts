@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, type Profile } from 'passport-google-oauth20';
-import oauthConfig from '@config/oauth.config';
+import oauthConfig from 'src/config/oauth.config';
 import { OauthProfile } from '../types/oauth.types';
 import { AuthService } from '../auth.service';
 import { AuthenticationMethod } from '@shared/enums';

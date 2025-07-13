@@ -16,6 +16,8 @@ export type Question = {
 	createdAt: string
 	updatedAt: string
 	user: User
+	views: number
+	answersCount: number
 }
 
 export type GetQuestionsResponse = {

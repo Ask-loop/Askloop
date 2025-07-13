@@ -5,10 +5,10 @@
     "start:dev": "nest start --watch",
     "build": "nest build",
     "start:debug": "nest start --debug --watch",
-    "migration:generate": "typeorm migration:generate src/database/migrations/migrations -d dist/src/database/data-source.js",
-    "migration:run": "typeorm migration:run -d dist/src/database/data-source.js",
-    "migration:revert": "typeorm migration:revert -d dist/src/database/data-source.js",
-    "migration:show": "typeorm migration:show -d dist/src/database/data-source.js"
+    "migration:generate": "typeorm migration:generate src/database/migrations/migrations -d dist/database/data-source.js",
+    "migration:run": "typeorm migration:run -d dist/database/data-source.js",
+    "migration:revert": "typeorm migration:revert -d dist/database/data-source.js",
+    "migration:show": "typeorm migration:show -d dist/database/data-source.js"
   },
   "keywords": [],
   "author": "",
@@ -22,9 +22,11 @@
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.3",
+    "@nestjs/platform-socket.io": "^11.1.3",
     "@nestjs/schedule": "^6.0.0",
     "@nestjs/throttler": "^6.4.0",
     "@nestjs/typeorm": "^11.0.0",
+    "@nestjs/websockets": "^11.1.3",
     "@react-email/components": "^0.1.1",
     "@react-email/html": "^0.0.11",
     "bcryptjs": "^3.0.2",
@@ -42,6 +44,7 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "slugify": "^1.6.6",
+    "socket.io": "^4.8.1",
     "typeorm": "^0.3.25"
   },
   "devDependencies": {

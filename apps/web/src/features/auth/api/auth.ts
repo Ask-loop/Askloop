@@ -1,6 +1,7 @@
 import {
 	AuthSchemaType,
-	ResetPasswordSchemaType
+	ResetPasswordSchemaType,
+	SignUpSchemaType
 } from '@/features/auth/lib/schema'
 import {
 	AuthResponse,
@@ -20,8 +21,8 @@ export const signIn = async (params: AuthSchemaType) => {
 	return response
 }
 
-export const signUp = async (params: AuthSchemaType) => {
-	const response = await axiosInstance.post<ApiResponse<AuthResponse>>(
+export const signUp = async (params: SignUpSchemaType) => {
+	const response = await axiosInstance.post<ApiResponse<null>>(
 		AuthEndpoints.SignUp,
 		params
 	)
@@ -30,7 +31,7 @@ export const signUp = async (params: AuthSchemaType) => {
 }
 
 export const verifyEmail = async (params: VerifyEmailReq) => {
-	const response = await axiosInstance.post<ApiResponse<null>>(
+	const response = await axiosInstance.post<ApiResponse<AuthResponse>>(
 		AuthEndpoints.VerifyEmail,
 		params
 	)
