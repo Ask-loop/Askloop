@@ -1,4 +1,4 @@
-import { AuthenticationMethod } from '@shared/enums';
+import { AuthenticationMethod } from '@common/enums';
 
 export type OauthProfile = {
   email: string;

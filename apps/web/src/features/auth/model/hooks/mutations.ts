@@ -8,7 +8,7 @@ import {
 	verifyEmail,
 	logout
 } from '@/features/auth/api'
-import { clearAuthCookie, setAuthCookie } from '@/features/auth/lib'
+import { clearAuthCookie } from '@/features/auth/lib'
 import {
 	AuthSchemaType,
 	ResetPasswordSchemaType,
@@ -27,14 +27,7 @@ export const useSignIn = () => {
 
 	const { mutate: signInMutation, isPending } = useMutation({
 		mutationFn: (params: AuthSchemaType) => signIn(params),
-		onSuccess: async response => {
-			const { accessToken, refreshToken } = response.data
-
-			await setAuthCookie({
-				accessToken,
-				refreshToken
-			})
-
+		onSuccess: () => {
 			router.push(ROUTES.home)
 		},
 		onError: toastCatchError

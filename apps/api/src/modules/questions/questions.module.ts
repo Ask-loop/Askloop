@@ -4,7 +4,7 @@ import { QuestionsController } from './questions.controller';
 import { UsersModule } from '@modules/users/users.module';
 import { TagsModule } from '@modules/tags/tags.module';
 import { TokensModule } from '@modules/tokens/tokens.module';
-import { RedisModule } from '@modules/redis/redis.module';
+import { RedisModule } from '@shared/redis/redis.module';
 import { QuestionVoteService } from './services/question-vote.service';
 
 @Module({

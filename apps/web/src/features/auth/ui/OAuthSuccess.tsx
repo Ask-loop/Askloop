@@ -11,7 +11,6 @@ import {
 	CardTitle
 } from '@/shared/shadcn/ui/card'
 import { toastCatchError } from '@/shared/utils/toast-message-handler'
-import { setAuthCookie } from '../lib'
 import { useAuthStore } from '../model/auth.store'
 import { ROUTES } from '@/constants/routes'
 
@@ -20,12 +19,10 @@ export const OAuthSuccess = () => {
 	const searchParams = useSearchParams()
 	const setUser = useAuthStore(state => state.setUser)
 
-	const accessToken = searchParams.get('accessToken')
-	const refreshToken = searchParams.get('refreshToken')
 	const userParam = searchParams.get('user')
 
 	const handleOAuthSuccess = async () => {
-		if (!accessToken || !refreshToken || !userParam) {
+		if (!userParam) {
 			toastCatchError('Invalid OAuth response')
 			return
 		}
@@ -33,15 +30,10 @@ export const OAuthSuccess = () => {
 		try {
 			const user = JSON.parse(decodeURIComponent(userParam))
 
-			await setAuthCookie({
-				accessToken,
-				refreshToken
-			})
-
 			setUser(user)
 
 			router.replace(ROUTES.home)
-		} catch (error) {
+		} catch {
 			toastCatchError('Invalid OAuth response')
 		}
 	}

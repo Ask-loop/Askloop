@@ -1,5 +1,5 @@
 import { IsEnum, IsString } from 'class-validator';
-import { AuthenticationMethod } from '@shared/enums';
+import { AuthenticationMethod } from '@common/enums';
 
 export class CreateAccountDto {
   @IsEnum(AuthenticationMethod)

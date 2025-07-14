@@ -7,7 +7,6 @@ import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@modules/auth/guards/auth.guard';
 import { Request } from 'express';
 
-@ApiBearerAuth('JWT-auth')
 @ApiTags('Tags')
 @Controller('tags')
 export class TagsController {

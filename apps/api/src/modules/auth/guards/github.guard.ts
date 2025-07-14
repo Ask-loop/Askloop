@@ -1,6 +1,6 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthenticationMethod } from '@shared/enums';
+import { AuthenticationMethod } from '@common/enums';
 
 @Injectable()
 export class GithubOAuthGuard extends AuthGuard(AuthenticationMethod.GITHUB) {

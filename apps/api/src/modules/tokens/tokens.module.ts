@@ -2,7 +2,7 @@ import { Module, forwardRef } from '@nestjs/common';
 import { TokensService } from './tokens.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { RedisModule } from '@modules/redis/redis.module';
+import { RedisModule } from '@shared/redis/redis.module';
 import { UsersModule } from '@modules/users/users.module';
 
 @Module({

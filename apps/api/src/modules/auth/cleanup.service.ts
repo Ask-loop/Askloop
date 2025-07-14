@@ -1,5 +1,5 @@
-import { MailService } from '@modules/mail/mail.service';
-import { RedisService } from '@modules/redis/redis.service';
+import { MailService } from '@shared/mail/mail.service';
+import { RedisService } from '@shared/redis/redis.service';
 import { UsersService } from '@modules/users/services';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';

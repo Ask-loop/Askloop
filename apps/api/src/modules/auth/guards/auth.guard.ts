@@ -1,3 +1,4 @@
+import { Cookies } from '@common/constants/cookies';
 import { TokensService } from '@modules/tokens/tokens.service';
 import { UsersService } from '@modules/users/services/users.service';
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
@@ -13,18 +14,16 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest() as Request;
-    const authHeader = request.get('authorization');
+    const user = request.cookies[Cookies.USER];
 
-    if (!authHeader) return false;
+    if (!user) return false;
 
-    const token = authHeader.split(' ')[1];
-
-    if (!token) return false;
+    const { accessToken } = JSON.parse(user);
 
     try {
-      const userId = await this.tokensService.decodeAccessToken(token);
+      const userId = await this.tokensService.decodeAccessToken(accessToken);
 
-      const isBlacklisted = await this.tokensService.isAccessTokenBlacklisted(userId, token);
+      const isBlacklisted = await this.tokensService.isAccessTokenBlacklisted(userId, accessToken);
 
       if (isBlacklisted) {
         throw new UnauthorizedException('Token has been revoked. Please sign in again.');

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Question } from '../entities/question.entity';
 import { QuestionVote } from '../entities/question-vote.entity';
-import { VoteType } from '@shared/enums';
+import { VoteType } from '@common/enums';
 
 @Injectable()
 export class QuestionVoteService {

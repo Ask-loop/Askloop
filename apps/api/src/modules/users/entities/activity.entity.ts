@@ -1,4 +1,4 @@
-import { ActivityType } from '@common/types/general.types';
+import { ActivityType } from '@shared/types/general.types';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, BaseEntity, ManyToOne } from 'typeorm';
 import { User } from '@modules/users/entities/user.entity';
 

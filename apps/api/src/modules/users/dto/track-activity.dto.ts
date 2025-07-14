@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsObject, IsNumber, IsString } from 'class-validator';
-import { ActivityType } from '@common/types';
+import { ActivityType } from '@common/enums';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class TrackActivityDto {

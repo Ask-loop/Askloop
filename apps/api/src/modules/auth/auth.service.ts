@@ -1,17 +1,17 @@
 import { UsersService } from '@modules/users/services';
-import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException, HttpException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { AuthDto, SignUpDto } from './dto/auth.dto';
 import { OauthProfile } from './types/oauth.types';
-import { MailService } from '@modules/mail/mail.service';
-import { AuthenticationMethod } from '@shared/enums';
+import { MailService } from '@shared/mail/mail.service';
+import { AuthenticationMethod } from '@common/enums';
 import { AccountsService } from '@modules/accounts/accounts.service';
 import { TokensService } from '@modules/tokens/tokens.service';
 import { comparePasswords, hashPassword } from '@shared/utils/password';
-import { successResponse } from '@shared/utils/response';
 import { User } from '@modules/users/entities';
 import { SignInResponse } from './types/sign-in.types';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
+import { TokensDto } from '@modules/tokens/dto/tokens.dto';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +25,7 @@ export class AuthService {
 
   // --- CORE AUTH METHODS --- //
 
-  async signIn(dto: AuthDto) {
+  async signIn(dto: AuthDto, res: Response) {
     const user = await this.usersService.findByEmail(dto.email);
 
     if (!user) throw new UnauthorizedException('Invalid credentials');
@@ -56,10 +56,9 @@ export class AuthService {
 
     const tokens = await this.tokensService.generateTokens(user.id);
 
-    return {
-      ...tokens,
-      user: this.normalizeUser(user),
-    };
+    this.setAuthCookies(res, tokens);
+
+    return this.normalizeUser(user);
   }
 
   async signUp(dto: SignUpDto) {
@@ -84,7 +83,7 @@ export class AuthService {
     await this.sendVerificationEmail(dto.email, verificationToken);
   }
 
-  async verifyEmail(verificationToken: string) {
+  async verifyEmail(verificationToken: string, res: Response) {
     const email = await this.tokensService.verifyEmailVerificationToken(verificationToken);
 
     const user = await this.usersService.findByEmail(email);
@@ -97,15 +96,17 @@ export class AuthService {
 
     const tokens = await this.tokensService.generateTokens(user.id);
 
-    return {
-      ...tokens,
-      user: this.normalizeUser(user),
-    };
+    this.setAuthCookies(res, tokens);
+
+    return this.normalizeUser(user);
   }
 
-  async signOut(userId: number) {
+  async signOut(userId: number, res: Response) {
+    const USER_COOKIE = this.configService.getOrThrow<string>('COOKIE_USER');
+
     await this.tokensService.revokeAllRefreshTokens(userId);
     await this.tokensService.blacklistAccessToken(userId);
+    res.clearCookie(USER_COOKIE);
   }
 
   async requestPasswordReset(email: string) {
@@ -150,7 +151,7 @@ export class AuthService {
     await this.usersService.update(userId, { password: hashedPassword });
   }
 
-  async refreshTokens(refreshToken: string) {
+  async refreshTokens(refreshToken: string, res: Response) {
     const { userId, rotationId } = await this.tokensService.decodeRefreshToken(refreshToken);
 
     await this.tokensService.verifyRefreshToken(refreshToken, userId, rotationId);
@@ -161,10 +162,9 @@ export class AuthService {
 
     const tokens = await this.tokensService.generateTokens(userId);
 
-    return {
-      ...tokens,
-      user: this.normalizeUser(user),
-    };
+    this.setAuthCookies(res, tokens);
+
+    return this.normalizeUser(user);
   }
 
   async deleteAccount(userId: number) {
@@ -182,28 +182,33 @@ export class AuthService {
   async oauthSignIn(profile: OauthProfile) {
     const existingAccount = await this.accountsService.findByProvider(profile.provider, profile?.providerId);
 
-    if (existingAccount) {
-      const user = await this.usersService.findById(existingAccount?.user?.id);
+    if (existingAccount && existingAccount?.user?.id) {
+      const user = await User.findOne({
+        where: {
+          id: existingAccount?.user?.id,
+        },
+      });
 
       if (!user) throw new UnauthorizedException('User not found');
 
-      // if (!user.emailVerified) {
-      //   const verificationToken = await this.tokensService.storeEmailVerificationToken(user.email);
+      if (!user.emailVerified) {
+        const verificationToken = await this.tokensService.storeEmailVerificationToken(user.email);
 
-      //   await this.mailService.sendUnverifiedReminderEmail(user.email, verificationToken);
+        await this.mailService.sendUnverifiedReminderEmail(user.email, verificationToken);
 
-      //   throw new BadRequestException('Please verify your email before logging in');
-      // }
+        throw new BadRequestException('Please verify your email before logging in');
+      }
 
       const tokens = await this.tokensService.generateTokens(user.id);
 
       return {
         ...tokens,
-        user: this.normalizeUser(user),
+        user,
       };
     }
 
     const existingUser = await this.usersService.findByEmail(profile.email);
+
     if (existingUser) {
       const account = await this.accountsService.findByProvider(profile.provider, existingUser.id.toString());
 
@@ -230,32 +235,23 @@ export class AuthService {
   }
 
   async callbackOauth(req: Request & { user: { data: SignInResponse } }, res: Response) {
-    const { accessToken, refreshToken, user } = req?.user;
+    const { accessToken, refreshToken, user } = req.user;
 
-    const redirectUrl = this.configService.getOrThrow<string>('ALLOWED_ORIGIN');
+    this.setAuthCookies(res, { accessToken, refreshToken });
 
-    const encodedUser = encodeURIComponent(JSON.stringify(user));
-
-    return res.redirect(
-      // prettier-ignore
-      `${redirectUrl}/oauth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&user=${encodedUser}`,
-    );
+    return res.redirect(`${this.configService.getOrThrow<string>('ALLOWED_ORIGIN')}/oauth/callback?user=${encodeURIComponent(JSON.stringify(user))}`);
   }
 
   // --- EMAIL METHODS --- //
 
   private async sendVerificationEmail(email: string, verificationToken: string) {
     await this.mailService.sendConfirmationEmail(email, verificationToken);
-
-    return successResponse(null, 'Email verification sent. Please check your email.');
   }
 
   async sendPasswordResetEmail(email: string) {
     const passwordResetToken = await this.tokensService.storePasswordResetToken(email);
 
     await this.mailService.sendPasswordResetEmail(email, passwordResetToken);
-
-    return successResponse(null, 'Password reset email sent');
   }
 
   private normalizeUser(user: User) {
@@ -273,5 +269,15 @@ export class AuthService {
       provider: user.provider,
       providerId: user.providerId,
     };
+  }
+
+  private setAuthCookies(res: Response, tokens: TokensDto) {
+    const USER_COOKIE = this.configService.getOrThrow<string>('COOKIE_USER');
+
+    res.cookie(USER_COOKIE, JSON.stringify(tokens), {
+      httpOnly: true,
+      secure: true,
+      maxAge: 1000 * 60 * 60 * 24 * 30,
+    });
   }
 }

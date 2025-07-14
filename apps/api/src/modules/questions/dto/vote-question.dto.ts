@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty } from 'class-validator';
-import { VoteType } from '@shared/enums';
+import { VoteType } from '@common/enums';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class VoteQuestionDto {

@@ -4,7 +4,7 @@ import { Strategy, type Profile } from 'passport-google-oauth20';
 import oauthConfig from 'src/config/oauth.config';
 import { OauthProfile } from '../types/oauth.types';
 import { AuthService } from '../auth.service';
-import { AuthenticationMethod } from '@shared/enums';
+import { AuthenticationMethod } from '@common/enums';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, AuthenticationMethod.GOOGLE) {
