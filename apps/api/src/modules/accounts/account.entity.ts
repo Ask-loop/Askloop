@@ -1,5 +1,5 @@
 import { User } from '@modules/users/entities/user.entity';
-import { AuthenticationMethod } from '@shared/enums';
+import { AuthenticationMethod } from '@common/enums';
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()

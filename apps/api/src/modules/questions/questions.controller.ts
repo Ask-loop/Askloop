@@ -3,13 +3,12 @@ import { QuestionsService } from './questions.service';
 import { GetQuestionsFilterDto } from './dto/get-questions-filter.dto';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@modules/auth/guards/auth.guard';
 import { Request } from 'express';
 import { QuestionVoteService } from './services/question-vote.service';
 import { VoteQuestionDto } from './dto/vote-question.dto';
 
-@ApiBearerAuth('JWT-auth')
 @ApiTags('Questions')
 @Controller('questions')
 export class QuestionsController {

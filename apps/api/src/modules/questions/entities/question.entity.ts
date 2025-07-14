@@ -19,7 +19,7 @@ import {
 } from 'typeorm';
 import slugify from 'slugify';
 import { QuestionVote } from './question-vote.entity';
-import { VoteType } from '@shared/enums';
+import { VoteType } from '@common/enums';
 
 @Entity()
 export class Question extends BaseEntity {

@@ -5,7 +5,7 @@ import { OauthProfile } from '@modules/auth/types/oauth.types';
 import { AccountsService } from '@modules/accounts/accounts.service';
 import { UsersStatsService } from './users-stats.service';
 import { ActivitiesService } from './activities.service';
-import { ActivityType } from '@common/types';
+import { ActivityType } from '@shared/types';
 import { FindManyOptions } from 'typeorm';
 import { GetUsersFilterDto, OrderByDate, OrderByUser } from '../dto/get-users-filter.dto';
 

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Activity } from '../entities/activity.entity';
-import { ActivityType } from '@common/types';
+import { ActivityType } from '@shared/types';
 import { UsersStatsService } from '@modules/users/services/users-stats.service';
 import { GetActivitiesByTypeFilterDto, GetActivitiesFilterDto } from '../dto';
 import { DataSource, SelectQueryBuilder } from 'typeorm';
@@ -22,7 +22,7 @@ export class ActivitiesService {
 
       const savedActivity = await manager.save(activity);
 
-      await this.usersStatsService.updateStats(userId, type);
+      await this.usersStatsService.initUserStats(userId);
 
       return savedActivity;
     });

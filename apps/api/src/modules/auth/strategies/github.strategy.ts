@@ -4,7 +4,7 @@ import { Strategy, Profile } from 'passport-github2';
 import oauthConfig from 'src/config/oauth.config';
 import { OauthProfile } from '../types/oauth.types';
 import { AuthService } from '../auth.service';
-import { AuthenticationMethod } from '@shared/enums';
+import { AuthenticationMethod } from '@common/enums';
 
 @Injectable()
 export class GithubStrategy extends PassportStrategy(Strategy, AuthenticationMethod.GITHUB) {

@@ -11,26 +11,13 @@ import { TransformInterceptor } from '@common/interceptors';
 dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
 
 (async () => {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bodyParser: true,
+  });
 
   const reflector = app.get(Reflector);
 
-  const config = new DocumentBuilder()
-    .setTitle('AskLoop API')
-    .setDescription('Q&A Platform API')
-    .setVersion('1.0')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'Authorization',
-        description: 'Enter JWT token',
-        in: 'header',
-      },
-      'JWT-auth',
-    )
-    .build();
+  const config = new DocumentBuilder().setTitle('AskLoop API').setDescription('Q&A Platform API').setVersion('1.0').build();
 
   const configService = app.get(ConfigService);
 
@@ -45,8 +32,9 @@ dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
   app.enableCors({
     origin: configService.getOrThrow<string>('ALLOWED_ORIGIN'),
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Cookie'],
     credentials: true,
+    exposedHeaders: ['Set-Cookie'],
   });
 
   app.useGlobalFilters(new AllExceptionsFilter());

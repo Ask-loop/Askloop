@@ -1,4 +1,4 @@
-import { RedisService } from '@modules/redis/redis.service';
+import { RedisService } from '@shared/redis/redis.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -115,7 +115,7 @@ export class TokensService {
       });
 
       return { userId: payload.sub as number, rotationId: payload.rotationId as string };
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }

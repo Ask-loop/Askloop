@@ -1,4 +1,4 @@
-import { ActivityType } from '@common/types';
+import { ActivityType } from '@common/enums';
 
 export const REPUTATION_CONSTANTS = {
   QUESTION_CREATION: 5,

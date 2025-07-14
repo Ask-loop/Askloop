@@ -1,14 +1,14 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { User } from '@modules/users/entities/user.entity';
 import { ActivitiesService, UsersService } from '../services';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthGuard } from '@modules/auth/guards/auth.guard';
 import { GetUsersFilterDto } from '../dto/get-users-filter.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UsersStatsService } from '../services/users-stats.service';
 import { GetActivitiesFilterDto } from '../dto/get-activities-filter.dto';
-@ApiBearerAuth('JWT-auth')
+
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {

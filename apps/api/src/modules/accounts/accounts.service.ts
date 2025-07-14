@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Account } from './account.entity';
-import { AuthenticationMethod } from '@shared/enums';
+import { AuthenticationMethod } from '@common/enums';
 import { User } from '@modules/users/entities/user.entity';
 
 @Injectable()

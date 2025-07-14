@@ -6,8 +6,8 @@ import { CreateQuestionDto } from './dto/create-question.dto';
 import { TagsService } from '@modules/tags/tags.service';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { ActivitiesService } from '@modules/users/services/activities.service';
-import { ActivityType } from '@common/types';
-import { RedisService } from '@modules/redis/redis.service';
+import { ActivityType } from '@common/enums';
+import { RedisService } from '@shared/redis/redis.service';
 import { QuestionVoteService } from './services/question-vote.service';
 
 @Injectable()

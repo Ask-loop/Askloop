@@ -1,6 +1,6 @@
 import { IsOptional } from 'class-validator';
 import { PaginationOptions } from '@common/dto/pagination.dto';
-import { ActivityType } from '@common/types';
+import { ActivityType } from '@shared/types';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class GetActivitiesFilterDto extends PaginationOptions {}

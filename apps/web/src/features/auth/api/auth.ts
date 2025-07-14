@@ -9,7 +9,7 @@ import {
 	VerifyEmailReq
 } from '@/features/auth/types'
 import { axiosInstance } from '@/shared/api'
-import { ApiResponse } from '@/shared/types'
+import { ApiResponse, User } from '@/shared/types'
 import { AuthEndpoints } from './endpoints'
 
 export const signIn = async (params: AuthSchemaType) => {
@@ -31,7 +31,7 @@ export const signUp = async (params: SignUpSchemaType) => {
 }
 
 export const verifyEmail = async (params: VerifyEmailReq) => {
-	const response = await axiosInstance.post<ApiResponse<AuthResponse>>(
+	const response = await axiosInstance.post<ApiResponse<User>>(
 		AuthEndpoints.VerifyEmail,
 		params
 	)

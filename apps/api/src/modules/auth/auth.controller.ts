@@ -7,11 +7,10 @@ import { Response } from 'express';
 import { AuthGuard } from './guards/auth.guard';
 import { GithubOAuthGuard } from './guards/github.guard';
 import { SignInResponse } from './types/sign-in.types';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Message } from '@common/decorators/message.decorator';
 
-@ApiBearerAuth('JWT-auth')
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -19,8 +18,8 @@ export class AuthController {
 
   @Post('sign-in')
   @HttpCode(200)
-  async signIn(@Body() authDto: AuthDto) {
-    return this.authService.signIn(authDto);
+  async signIn(@Body() authDto: AuthDto, @Res() res: Response) {
+    return this.authService.signIn(authDto, res);
   }
 
   @Post('sign-up')
@@ -33,21 +32,21 @@ export class AuthController {
   @Post('verify-email')
   @Message('Email verified successfully')
   @HttpCode(200)
-  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
-    return this.authService.verifyEmail(verifyEmailDto.verificationToken);
+  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto, @Res() res: Response) {
+    return this.authService.verifyEmail(verifyEmailDto.verificationToken, res);
   }
 
   @Post('sign-out')
   @UseGuards(AuthGuard)
-  async signOut(@Req() req: Request) {
-    return this.authService.signOut(req?.user?.id);
+  async signOut(@Req() req: Request, @Res() res: Response) {
+    return this.authService.signOut(req?.user?.id, res);
   }
 
   @Post('refresh-tokens')
   @Throttle({ default: { limit: 20, ttl: 60 } })
   @HttpCode(200)
-  async refreshTokens(@Body() refreshTokenDto: RefreshTokenDto) {
-    return this.authService.refreshTokens(refreshTokenDto.refreshToken);
+  async refreshTokens(@Body() refreshTokenDto: RefreshTokenDto, @Res() res: Response) {
+    return this.authService.refreshTokens(refreshTokenDto.refreshToken, res);
   }
 
   @Post('request-password-reset')

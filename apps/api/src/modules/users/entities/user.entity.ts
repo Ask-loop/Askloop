@@ -1,4 +1,4 @@
-import { AuthenticationMethod, Role } from '@shared/enums';
+import { AuthenticationMethod, Role } from '@common/enums';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, BaseEntity, OneToOne, JoinColumn } from 'typeorm';
 import { Account } from '@modules/accounts/account.entity';
 import { Question } from '@modules/questions/entities/question.entity';

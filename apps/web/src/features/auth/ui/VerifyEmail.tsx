@@ -4,7 +4,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect } from 'react'
 import { Spinner } from '@/shared/shadcn/ui'
 import { toastSuccess } from '@/shared/utils/toast-message-handler'
-import { setAuthCookie } from '../lib'
 import { useAuthStore } from '../model/auth.store'
 import { useVerifyEmail } from '../model/hooks'
 import { AuthWrapper } from './AuthWrapper'
@@ -25,12 +24,7 @@ export const VerifyEmail = () => {
 			},
 			{
 				onSuccess: async response => {
-					await setAuthCookie({
-						accessToken: response.data.accessToken,
-						refreshToken: response.data.refreshToken
-					})
-
-					setUser(response.data.user)
+					setUser(response.data)
 
 					toastSuccess(response.message)
 

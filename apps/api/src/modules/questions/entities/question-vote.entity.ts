@@ -1,7 +1,7 @@
 import { BaseEntity, BeforeInsert, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
 import { Question } from './question.entity';
 import { User } from '@modules/users/entities/user.entity';
-import { VoteType } from '@shared/enums';
+import { VoteType } from '@common/enums';
 
 @Entity()
 @Unique(['question', 'user'])

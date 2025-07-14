@@ -1,12 +1,10 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ActivitiesService } from '../services/activities.service';
-import { ActivityType } from '@common/types';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { GetActivitiesByTypeFilterDto, GetActivitiesFilterDto, GetRecentActivitiesFilterDto } from '../dto';
 
 @Controller('activities')
 @ApiTags('Activities')
-@ApiBearerAuth('JWT-auth')
 export class ActivitiesController {
   constructor(private readonly activitiesService: ActivitiesService) {}
 

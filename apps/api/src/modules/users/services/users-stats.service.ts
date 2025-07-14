@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource, EntityManager } from 'typeorm';
 import { UsersStats } from '../entities/users-stats.entity';
-import { ActivityType } from '@common/types';
+import { ActivityType } from '@shared/types';
 import { User } from '../entities/user.entity';
 import { UpdateBadgesDto, UpdateReputationDto } from '../dto/users-stats.dto';
 import { GetUserStatsFilterDto } from '../dto/get-user-stats-filter.dto';
