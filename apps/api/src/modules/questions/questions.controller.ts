@@ -55,4 +55,9 @@ export class QuestionsController {
   deleteQuestion(@Param('id') id: string) {
     return this.questionsService.deleteQuestion(Number(id));
   }
+
+  @Get(':id/answers')
+  getAnswersByQuestion(@Param('id') id: string) {
+    return this.questionsService.getAnswersByQuestion(Number(id));
+  }
 }

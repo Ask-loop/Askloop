@@ -2,17 +2,15 @@
 
 import { motion } from 'framer-motion'
 import { FaShare } from 'react-icons/fa'
-import {
-	Button,
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle
-} from '@/shared/shadcn/ui'
+import { Button } from '@/shared/shadcn/ui'
+import { QuestionRightBarProps } from '../../model/types'
 import { QuestionStats } from './QuestionStats'
 import { SimilarQuestions } from './SimilarQuestions'
 
-export const QuestionRightBar = () => {
+export const QuestionRightBar = ({
+	stats,
+	similarQuestions
+}: QuestionRightBarProps) => {
 	return (
 		<motion.div
 			initial={{ opacity: 0 }}
@@ -24,10 +22,8 @@ export const QuestionRightBar = () => {
 				<FaShare />
 				Share
 			</Button>
-
-			<QuestionStats />
-
-			<SimilarQuestions />
+			<QuestionStats {...stats} />
+			<SimilarQuestions questions={similarQuestions} />
 		</motion.div>
 	)
 }

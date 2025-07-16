@@ -14,13 +14,16 @@ import { toastCatchError } from '../utils/toast-message-handler'
 import { ROUTES } from '@/constants'
 
 interface RefreshQueueItem {
-	resolve: (token?: string) => void
+	resolve: () => void
 	reject: (error: unknown) => void
 }
 
 interface RetryableRequest extends AxiosRequestConfig {
 	_retry?: boolean
 }
+
+export const API_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api`
+
 class Instance {
 	private instance: AxiosInstance
 	private isRefreshing = false
@@ -28,7 +31,7 @@ class Instance {
 
 	constructor() {
 		this.instance = axios.create({
-			baseURL: process.env.NEXT_PUBLIC_API_URL,
+			baseURL: API_URL,
 			timeout: 10_000,
 			withCredentials: true,
 			headers: {
@@ -36,23 +39,10 @@ class Instance {
 			}
 		})
 
-		this.instance.interceptors.request.use(this.handleRequest.bind(this))
 		this.instance.interceptors.response.use(
 			this.handleResponse,
 			this.handleError.bind(this)
 		)
-	}
-
-	private async handleRequest(
-		config: InternalAxiosRequestConfig
-	): Promise<InternalAxiosRequestConfig> {
-		const tokens = await getAuthCookie()
-
-		if (tokens?.accessToken) {
-			config.headers.set('Authorization', `Bearer ${tokens.accessToken}`)
-		}
-
-		return config
 	}
 
 	private handleResponse(response: AxiosResponse): AxiosResponse {
@@ -98,18 +88,8 @@ class Instance {
 	): Promise<AxiosResponse> {
 		return new Promise<AxiosResponse>((resolve, reject) => {
 			this.refreshQueue.push({
-				resolve: (token?: string) => {
-					if (token) {
-						originalRequest.headers = {
-							...originalRequest.headers,
-							Authorization: `Bearer ${token}`
-						}
-						this.instance(originalRequest)
-							.then(resolve)
-							.catch(reject)
-					} else {
-						reject(new Error('Token refresh failed'))
-					}
+				resolve: () => {
+					this.instance(originalRequest).then(resolve).catch(reject)
 				},
 				reject
 			})
@@ -123,13 +103,8 @@ class Instance {
 		this.isRefreshing = true
 
 		try {
-			const user = await this.performTokenRefresh(refreshToken)
-			useAuthStore.getState().setUser(user)
-
-			const newTokens = await getAuthCookie()
-			const newAccessToken = newTokens?.accessToken
-
-			this.processQueue(undefined, newAccessToken || undefined)
+			await this.performTokenRefresh(refreshToken)
+			this.processQueue()
 
 			return this.instance(originalRequest)
 		} catch (refreshError) {
@@ -141,12 +116,12 @@ class Instance {
 		}
 	}
 
-	private processQueue(error: unknown, token?: string): void {
+	private processQueue(error?: unknown): void {
 		for (const { resolve, reject } of this.refreshQueue) {
 			if (error) {
 				reject(error)
 			} else {
-				resolve(token)
+				resolve()
 			}
 		}
 		this.refreshQueue = []
@@ -173,28 +148,20 @@ class Instance {
 				globalThis.location.replace(ROUTES.signIn)
 			}
 
-			console.log(tokens)
-
 			if (tokens?.accessToken) {
-				await this.notifyServerLogout(tokens.accessToken)
+				await this.notifyServerLogout()
 			}
 		} catch (error) {
 			toastCatchError(error)
 		}
 	}
 
-	private async notifyServerLogout(accessToken: string): Promise<void> {
-		await axios.post(
-			`${process.env.NEXT_PUBLIC_API_URL}${AuthEndpoints.SignOut}`,
-			undefined,
-			{
-				withCredentials: true,
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${accessToken}`
-				}
+	private async notifyServerLogout(): Promise<void> {
+		await axios.post(`${API_URL}${AuthEndpoints.SignOut}`, undefined, {
+			headers: {
+				'Content-Type': 'application/json'
 			}
-		)
+		})
 	}
 
 	async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {

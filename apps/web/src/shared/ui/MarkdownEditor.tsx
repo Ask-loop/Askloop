@@ -4,10 +4,9 @@ import '@uiw/react-markdown-preview/markdown.css'
 import MDEditor, { ContextStore, commands } from '@uiw/react-md-editor'
 import '@uiw/react-md-editor/markdown-editor.css'
 import { useTheme } from 'next-themes'
-import { ChangeEvent, useMemo } from 'react'
+import { ChangeEvent } from 'react'
 import { cn } from '../lib'
-import { getPlainText } from '../lib/getPlainText'
-import { FormControl, FormDescription, FormMessage } from '../shadcn/ui'
+import { FormControl, FormMessage } from '../shadcn/ui'
 
 type MarkdownEditorProps = {
 	value: string
@@ -49,7 +48,10 @@ export const MarkdownEditor = ({
 						height={300}
 						preview='edit'
 						visibleDragbar={false}
-						className='bg-input! w-full rounded-md! border-none!'
+						className={cn(
+							'bg-input! w-full rounded-md! border-none!',
+							className
+						)}
 						tabSize={2}
 						data-color-mode={theme === 'dark' ? 'dark' : 'light'}
 						textareaProps={{

@@ -37,3 +37,11 @@ export type GetQuestionsReq = Pagination & {
 	sortBy?: QuestionSortBy
 	orderBy?: QuestionOrderBy
 }
+
+export type Answer = {
+	id: number
+	content: string
+	createdAt: string
+	updatedAt: string
+	user: User
+}

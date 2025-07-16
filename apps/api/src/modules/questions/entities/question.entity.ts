@@ -20,6 +20,7 @@ import {
 import slugify from 'slugify';
 import { QuestionVote } from './question-vote.entity';
 import { VoteType } from '@common/enums';
+import { Answer } from '@modules/answers/entities/answer.entity';
 
 @Entity()
 export class Question extends BaseEntity {
@@ -52,6 +53,9 @@ export class Question extends BaseEntity {
 
   @OneToMany(() => QuestionVote, vote => vote.question, { cascade: true })
   votes: QuestionVote[];
+
+  @OneToMany(() => Answer, answer => answer.question, { cascade: true })
+  answers: Answer[];
 
   get upvotes(): number {
     return this.votes?.filter(v => v.vote === VoteType.Up).length || 0;

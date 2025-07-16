@@ -2,9 +2,9 @@
 
 import { formatDistanceToNow } from 'date-fns'
 import { motion } from 'framer-motion'
-import { Share2 } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { FaComment } from 'react-icons/fa'
+import { AnswersList } from '@/features/answers/ui/AnswersList'
 import { QuestionVote } from '@/features/questions'
 import { useGetQuestionBySlug } from '@/features/questions/hooks/queries'
 import { Badge, Card, CardContent } from '@/shared/shadcn/ui'
@@ -13,6 +13,7 @@ import { MarkdownParser } from '@/shared/ui/MarkdowParser'
 import { QuestionDetailError } from './QuestionDetailError'
 import { QuestionDetailSkeleton } from './QuestionDetailSkeleton'
 import { QuestionRightBar } from './QuestionRightBar'
+import type { QuestionRightBarProps } from './QuestionRightBar'
 import { UserAvatar } from '@/entities/user/ui/UserAvatar'
 
 export const QuestionDetail = () => {
@@ -25,6 +26,14 @@ export const QuestionDetail = () => {
 
 	if (isLoading) return <QuestionDetailSkeleton />
 	if (isError || !question) return <QuestionDetailError />
+
+	const stats = {
+		asked: formatDistanceToNow(new Date(question.createdAt)),
+		views: question.views,
+		answers: question.answersCount
+	}
+
+	const similarQuestions: QuestionRightBarProps['similarQuestions'] = []
 
 	return (
 		<>
@@ -70,13 +79,11 @@ export const QuestionDetail = () => {
 
 								<div className='flex-1'>
 									<CardContent className='pt-6 pb-4'>
-										<div className='prose dark:prose-invert max-w-full break-words'>
-											<MarkdownParser
-												markdown={question.body}
-											/>
-										</div>
+										<MarkdownParser
+											markdown={question.body}
+										/>
 
-										{question.tags?.length > 0 && (
+										{!!question.tags?.length && (
 											<motion.div
 												initial={{ opacity: 0 }}
 												animate={{ opacity: 1 }}
@@ -103,7 +110,7 @@ export const QuestionDetail = () => {
 										>
 											<div className='bg-secondary/30 flex items-center gap-3 rounded-lg px-4 py-2'>
 												<UserAvatar
-													fallback={question.user.displayName?.charAt(
+													fallback={question.user?.displayName?.charAt(
 														0
 													)}
 													src={question.user?.picture}
@@ -119,31 +126,33 @@ export const QuestionDetail = () => {
 													<span className='text-muted-foreground text-xs'>
 														Asked{' '}
 														{formatDistanceToNow(
-															question.createdAt
+															new Date(
+																question.createdAt
+															)
 														)}{' '}
 														ago
 													</span>
 												</div>
 											</div>
 
-											<div className='flex items-center gap-3'>
-												<Button
-													variant='ghost'
-													size='sm'
-												>
-													<FaComment className='mr-2 h-4 w-4' />
-													Add comment
-												</Button>
-											</div>
+											<Button variant='ghost' size='sm'>
+												<FaComment className='mr-2 h-4 w-4' />
+												Add comment
+											</Button>
 										</motion.div>
 									</CardContent>
 								</div>
 							</div>
 						</Card>
 					</motion.div>
+
+					<AnswersList questionId={question.id} />
 				</motion.div>
 
-				<QuestionRightBar />
+				<QuestionRightBar
+					stats={stats}
+					similarQuestions={similarQuestions}
+				/>
 			</div>
 		</>
 	)

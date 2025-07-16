@@ -24,7 +24,10 @@ export const MarkdownParser = ({
 	return (
 		<div
 			data-color-mode={theme}
-			className={cn('text-muted-foreground', className)}
+			className={cn(
+				'prose dark:prose-invert max-w-[80ch] break-words',
+				className
+			)}
 		>
 			<MarkdownPreview
 				remarkPlugins={[remarkGfm]}
