@@ -16,6 +16,11 @@ export class WsAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client = context.switchToWs().getClient() as Socket;
+
+    return this.validateToken(client);
+  }
+
+  private async validateToken(client: Socket) {
     const cookies = parse(client.handshake?.headers?.cookie || '');
 
     const userCookie = JSON.parse(cookies[Cookies.USER] || '{}');

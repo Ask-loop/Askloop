@@ -7,8 +7,8 @@ import * as passport from 'passport';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AllExceptionsFilter } from '@common/filters';
 import { TransformInterceptor } from '@common/interceptors';
-import { RedisService } from '@shared/redis/redis.service';
 import { RedisAdapter } from './adapters/redis.adapter';
+import { RedisService } from '@shared/redis/redis.service';
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
 
@@ -50,8 +50,8 @@ void (async () => {
     },
   });
 
-  // const redisService = app.get(RedisService);
-  // app.useWebSocketAdapter(new RedisAdapter(app, redisService));
+  const redisService = app.get(RedisService);
+  app.useWebSocketAdapter(new RedisAdapter(app, redisService));
 
   await app.listen(configService.getOrThrow('PORT'));
 })();

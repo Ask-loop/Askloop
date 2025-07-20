@@ -24,7 +24,9 @@ class RedisAdapter extends IoAdapter {
     const pubClient = this.redisService['redisClient'];
 
     const subClient = pubClient.duplicate();
+
     server.adapter(createAdapter(pubClient, subClient));
+
     return server;
   }
 }
