@@ -7,13 +7,13 @@ import * as passport from 'passport';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AllExceptionsFilter } from '@common/filters';
 import { TransformInterceptor } from '@common/interceptors';
+import { RedisAdapter } from './adapters/redis.adapter';
+import { RedisService } from '@shared/redis/redis.service';
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
 
-(async () => {
-  const app = await NestFactory.create(AppModule, {
-    bodyParser: true,
-  });
+void (async () => {
+  const app = await NestFactory.create(AppModule);
 
   const reflector = app.get(Reflector);
 
@@ -31,9 +31,9 @@ dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
 
   app.enableCors({
     origin: configService.getOrThrow<string>('ALLOWED_ORIGIN'),
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Cookie'],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Cookie'],
     exposedHeaders: ['Set-Cookie'],
   });
 
@@ -49,6 +49,9 @@ dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
       persistAuthorization: true,
     },
   });
+
+  const redisService = app.get(RedisService);
+  app.useWebSocketAdapter(new RedisAdapter(app, redisService));
 
   await app.listen(configService.getOrThrow('PORT'));
 })();

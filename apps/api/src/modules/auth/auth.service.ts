@@ -12,6 +12,7 @@ import { SignInResponse } from './types/sign-in.types';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import { TokensDto } from '@modules/tokens/dto/tokens.dto';
+import { serialize } from 'cookie';
 
 @Injectable()
 export class AuthService {
@@ -56,7 +57,7 @@ export class AuthService {
 
     const tokens = await this.tokensService.generateTokens(user.id);
 
-    this.setAuthCookies(res, tokens);
+    await this.setAuthCookies(res, tokens);
 
     return this.normalizeUser(user);
   }
@@ -96,17 +97,17 @@ export class AuthService {
 
     const tokens = await this.tokensService.generateTokens(user.id);
 
-    this.setAuthCookies(res, tokens);
+    await this.setAuthCookies(res, tokens);
 
     return this.normalizeUser(user);
   }
 
-  async signOut(userId: number, res: Response) {
-    const USER_COOKIE = this.configService.getOrThrow<string>('COOKIE_USER');
-
+  async signOut(res: Response, userId: number) {
     await this.tokensService.revokeAllRefreshTokens(userId);
+
     await this.tokensService.blacklistAccessToken(userId);
-    res.clearCookie(USER_COOKIE);
+
+    res.clearCookie(this.configService.getOrThrow<string>('COOKIE_USER'));
   }
 
   async requestPasswordReset(email: string) {
@@ -162,7 +163,7 @@ export class AuthService {
 
     const tokens = await this.tokensService.generateTokens(userId);
 
-    this.setAuthCookies(res, tokens);
+    await this.setAuthCookies(res, tokens);
 
     return this.normalizeUser(user);
   }
@@ -237,7 +238,7 @@ export class AuthService {
   async callbackOauth(req: Request & { user: { data: SignInResponse } }, res: Response) {
     const { accessToken, refreshToken, user } = req.user;
 
-    this.setAuthCookies(res, { accessToken, refreshToken });
+    await this.setAuthCookies(res, { accessToken, refreshToken });
 
     return res.redirect(`${this.configService.getOrThrow<string>('ALLOWED_ORIGIN')}/oauth/callback?user=${encodeURIComponent(JSON.stringify(user))}`);
   }
@@ -271,13 +272,17 @@ export class AuthService {
     };
   }
 
-  private setAuthCookies(res: Response, tokens: TokensDto) {
+  private async setAuthCookies(res: Response, tokens: TokensDto) {
     const USER_COOKIE = this.configService.getOrThrow<string>('COOKIE_USER');
 
-    res.cookie(USER_COOKIE, JSON.stringify(tokens), {
+    const cookie = serialize(USER_COOKIE, JSON.stringify(tokens), {
       httpOnly: true,
-      secure: true,
-      maxAge: 1000 * 60 * 60 * 24 * 30,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
+      sameSite: 'lax',
     });
+
+    await res.setHeader('Set-Cookie', cookie);
   }
 }

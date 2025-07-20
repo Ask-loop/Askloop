@@ -19,6 +19,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { QuestionsModule } from '@modules/questions/questions.module';
 import { TagsModule } from '@modules/tags/tags.module';
+import { SocketsModule } from './sockets/sockets.module';
+import { AnswersModule } from '@modules/answers/answers.module';
 
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { TagsModule } from '@modules/tags/tags.module';
     TokensModule,
     QuestionsModule,
     TagsModule,
+    SocketsModule,
+    AnswersModule,
   ],
 })
 export class AppModule {}

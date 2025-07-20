@@ -206,4 +206,16 @@ export class QuestionsService {
 
     return question;
   }
+
+  async getAnswersByQuestion(questionId: number) {
+    const question = await Question.findOne({ where: { id: questionId }, relations: ['answers'] });
+
+    console.log(question);
+
+    if (!question) {
+      throw new NotFoundException('Question not found');
+    }
+
+    return question.answers;
+  }
 }

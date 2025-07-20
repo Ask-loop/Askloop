@@ -1,7 +1,17 @@
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/shadcn/ui'
 
-export const QuestionStats = () => {
+type QuestionStatsProps = {
+	asked: string
+	views: number
+	answers: number
+}
+
+export const QuestionStats = ({
+	asked,
+	views,
+	answers
+}: QuestionStatsProps) => {
 	return (
 		<Card>
 			<CardHeader>
@@ -10,15 +20,15 @@ export const QuestionStats = () => {
 			<CardContent className='space-y-2'>
 				<div className='flex items-center justify-between'>
 					<span className='text-muted-foreground'>Asked</span>
-					<span>July 9, 2025</span>
+					<span>{asked}</span>
 				</div>
 				<div className='flex items-center justify-between'>
 					<span className='text-muted-foreground'>Views</span>
-					<span>122</span>
+					<span>{views}</span>
 				</div>
 				<div className='flex items-center justify-between'>
 					<span className='text-muted-foreground'>Answers</span>
-					<span>2</span>
+					<span>{answers}</span>
 				</div>
 			</CardContent>
 		</Card>

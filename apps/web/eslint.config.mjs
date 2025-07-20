@@ -41,7 +41,6 @@ const config = [
 	{
 		rules: {
 			'no-undef': 'error',
-			'react/react-in-jsx-scope': 'off',
 			'tailwindcss/no-custom-classname': 'off',
 			'@typescript-eslint/no-unused-vars': [
 				'error',
@@ -60,7 +59,7 @@ const config = [
 			'no-console': 'warn',
 			'react-hooks/exhaustive-deps': 'off',
 			'unicorn/filename-case': 'off',
-			'drizzle/enforce-delete-with-where': 'off'
+			'drizzle/enforce-delete-with-where': 'off',
 		}
 	}
 ]

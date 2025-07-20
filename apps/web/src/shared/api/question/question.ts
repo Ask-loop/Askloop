@@ -3,7 +3,12 @@ import { axiosInstance } from '@/shared/api'
 import { GetTagsReq, GetTagsResponse } from '@/shared/types'
 import { ApiResponse } from '@/shared/types/common.types'
 import { QuestionsEndpoints } from './endpoints'
-import { GetQuestionsReq, GetQuestionsResponse, Question } from './types'
+import {
+	Answer,
+	GetQuestionsReq,
+	GetQuestionsResponse,
+	Question
+} from './types'
 
 export const getQuestions = async (params: GetQuestionsReq) => {
 	const response = await axiosInstance.get<ApiResponse<GetQuestionsResponse>>(
@@ -35,6 +40,14 @@ export const getTags = async (params: GetTagsReq) => {
 export const getQuestionBySlug = async (slug: string) => {
 	const response = await axiosInstance.get<ApiResponse<Question>>(
 		`${QuestionsEndpoints.QuestionBySlug.replace(':slug', slug)}`
+	)
+
+	return response.data
+}
+
+export const getAnswersByQuestion = async (questionId: number) => {
+	const response = await axiosInstance.get<ApiResponse<Answer[]>>(
+		`${QuestionsEndpoints.AnswersByQuestion.replace(':questionId', questionId.toString())}`
 	)
 
 	return response.data

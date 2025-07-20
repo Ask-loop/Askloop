@@ -19,7 +19,14 @@ export class AuthController {
   @Post('sign-in')
   @HttpCode(200)
   async signIn(@Body() authDto: AuthDto, @Res() res: Response) {
-    return this.authService.signIn(authDto, res);
+    const user = await this.authService.signIn(authDto, res);
+
+    const response = {
+      user,
+      success: true,
+    };
+
+    return res.json(response);
   }
 
   @Post('sign-up')
@@ -33,20 +40,26 @@ export class AuthController {
   @Message('Email verified successfully')
   @HttpCode(200)
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto, @Res() res: Response) {
-    return this.authService.verifyEmail(verifyEmailDto.verificationToken, res);
+    await this.authService.verifyEmail(verifyEmailDto.verificationToken, res);
+
+    return res.json({ message: 'Email verified successfully' });
   }
 
   @Post('sign-out')
   @UseGuards(AuthGuard)
-  async signOut(@Req() req: Request, @Res() res: Response) {
-    return this.authService.signOut(req?.user?.id, res);
+  async signOut(@Res() res: Response, @Req() req: Request) {
+    await this.authService.signOut(res, req.user.id);
+
+    return res.json({ message: 'Signed out successfully' });
   }
 
   @Post('refresh-tokens')
   @Throttle({ default: { limit: 20, ttl: 60 } })
   @HttpCode(200)
   async refreshTokens(@Body() refreshTokenDto: RefreshTokenDto, @Res() res: Response) {
-    return this.authService.refreshTokens(refreshTokenDto.refreshToken, res);
+    const user = await this.authService.refreshTokens(refreshTokenDto.refreshToken, res);
+
+    return res.json(user);
   }
 
   @Post('request-password-reset')
@@ -86,12 +99,16 @@ export class AuthController {
   @Get('oauth/callback/google')
   @UseGuards(GoogleOAuthGuard)
   async oauthCallbackGoogle(@Req() req: Request & { user: { data: SignInResponse } }, @Res() res: Response) {
-    return this.authService.callbackOauth(req, res);
+    const user = await this.authService.callbackOauth(req, res);
+
+    return res.json(user);
   }
 
   @Get('oauth/callback/github')
   @UseGuards(GithubOAuthGuard)
   async oauthCallbackGithub(@Req() req: Request & { user: { data: SignInResponse } }, @Res() res: Response) {
-    return this.authService.callbackOauth(req, res);
+    const user = await this.authService.callbackOauth(req, res);
+
+    return res.json(user);
   }
 }
