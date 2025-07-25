@@ -235,7 +235,7 @@ export class AuthService {
     };
   }
 
-  async callbackOauth(req: Request & { user: { data: SignInResponse } }, res: Response) {
+  async callbackOauth(req: Request & { user: SignInResponse }, res: Response) {
     const { accessToken, refreshToken, user } = req.user;
 
     await this.setAuthCookies(res, { accessToken, refreshToken });
@@ -283,6 +283,6 @@ export class AuthService {
       sameSite: 'lax',
     });
 
-    await res.setHeader('Set-Cookie', cookie);
+    res.setHeader('Set-Cookie', cookie);
   }
 }

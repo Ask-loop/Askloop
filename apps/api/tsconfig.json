@@ -26,5 +26,6 @@
       "@config/*": ["src/config/*"],
       "@database/*": ["./src/database/*"]
     }
-  }
+  },
+  "include": ["src", "types", "appsignal.cjs"]
 }

@@ -4,11 +4,9 @@ const nextConfig: NextConfig = {
 	eslint: {
 		dirs: ['src']
 	},
+
 	swcMinify: true,
-	serverRuntimeConfig: {
-		host: 'localhost',
-		port: 3000
-	},
+
 	images: {
 		remotePatterns: [
 			{
