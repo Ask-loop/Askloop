@@ -1,5 +1,8 @@
 export const NAMESPACES = {
-  EVENTS: '/events',
+  ROOT: '/',
+  ANSWERS: '/answers',
+  QUESTIONS: '/questions',
+  COMMENTS: '/comments',
 };
 
 export const SOCKET_EVENTS = {

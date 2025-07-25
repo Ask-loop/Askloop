@@ -5,7 +5,7 @@ export type Answer = {
   updatedAt: Date;
 };
 
-export type CreateAnswerDto = Pick<Answer, 'content'> & {
+export type CreateAnswer = Pick<Answer, 'content'> & {
   questionId: number;
   userId: number;
 };

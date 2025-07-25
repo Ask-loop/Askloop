@@ -2,12 +2,12 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { Answer } from './entities/answer.entity';
 import { User } from '@modules/users/entities/user.entity';
 import { Question } from '@modules/questions/entities/question.entity';
-import { CreateAnswerDto } from './answers.types';
+import { CreateAnswerDto } from './dto/create-answer.dto';
 
 @Injectable()
 export class AnswersService {
-  async createAnswer(dto: CreateAnswerDto): Promise<Answer> {
-    const { questionId, userId, content } = dto;
+  async createAnswer(dto: CreateAnswerDto, userId: number): Promise<Answer> {
+    const { questionId, content } = dto;
 
     const user = await User.findOne({ where: { id: userId } });
 

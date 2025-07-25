@@ -3,12 +3,11 @@ import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { AuthDto, VerifyEmailDto, RefreshTokenDto, RequestPasswordResetDto, ResetPasswordDto, ChangePasswordDto, SignUpDto } from './dto/auth.dto';
 import { GoogleOAuthGuard } from './guards/google.guard';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { AuthGuard } from './guards/auth.guard';
 import { GithubOAuthGuard } from './guards/github.guard';
 import { SignInResponse } from './types/sign-in.types';
 import { ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
 import { Message } from '@common/decorators/message.decorator';
 
 @ApiTags('Auth')
@@ -98,7 +97,7 @@ export class AuthController {
 
   @Get('oauth/callback/google')
   @UseGuards(GoogleOAuthGuard)
-  async oauthCallbackGoogle(@Req() req: Request & { user: { data: SignInResponse } }, @Res() res: Response) {
+  async oauthCallbackGoogle(@Req() req: Request & { user: SignInResponse }, @Res() res: Response) {
     const user = await this.authService.callbackOauth(req, res);
 
     return res.json(user);
@@ -106,7 +105,7 @@ export class AuthController {
 
   @Get('oauth/callback/github')
   @UseGuards(GithubOAuthGuard)
-  async oauthCallbackGithub(@Req() req: Request & { user: { data: SignInResponse } }, @Res() res: Response) {
+  async oauthCallbackGithub(@Req() req: Request & { user: SignInResponse }, @Res() res: Response) {
     const user = await this.authService.callbackOauth(req, res);
 
     return res.json(user);

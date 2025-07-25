@@ -29,7 +29,7 @@ export class QuestionsController {
 
   @Get('slug/:slug')
   getQuestionBySlug(@Param('slug') slug: string, @Req() req: Request) {
-    return this.questionsService.getQuestionBySlug(slug, req?.ip || req?.headers['x-forwarded-for'] || req?.headers['x-real-ip']);
+    return this.questionsService.getQuestionBySlug(slug, req?.ip || '');
   }
 
   @Post(':id/vote')

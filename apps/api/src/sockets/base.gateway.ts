@@ -2,13 +2,11 @@ import { WebSocketGateway, WebSocketServer, ConnectedSocket, OnGatewayConnection
 import { Server, Socket as IOSocket } from 'socket.io';
 import { UseGuards } from '@nestjs/common';
 import { WsAuthGuard } from './guards/ws-auth.guard';
+import { createGatewayConfig } from './config/gateway.config';
+import { NAMESPACES } from './sockets.constants';
 
-@WebSocketGateway({
-  namespace: '/',
-  cors: { origin: process.env.ALLOWED_ORIGIN, credentials: true },
-  transports: ['websocket'],
-  autoConnect: true,
-})
+// Base gateway for handling WebSocket connections
+@WebSocketGateway(createGatewayConfig(NAMESPACES.ROOT))
 @UseGuards(WsAuthGuard)
 export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
