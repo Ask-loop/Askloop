@@ -11,7 +11,8 @@ import { GetTagsReq } from '@/shared/types'
 export const useGetQuestions = (params: GetQuestionsReq) => {
 	const { data, isLoading } = useQuery({
 		queryKey: queryKeys.questions(params),
-		queryFn: () => getQuestions(params)
+		queryFn: () => getQuestions(params),
+		refetchOnMount: true
 	})
 
 	return { data, isLoading }
@@ -28,11 +29,12 @@ export const useGetQuestionBySlug = (slug: string) => {
 }
 
 export const useGetTags = (params: GetTagsReq) => {
-	const { data, isLoading } = useQuery({
-		queryKey: queryKeys.tags(params),
-		queryFn: () => getTags(params),
-		enabled: !!params.search
-	})
+	const { data, isLoading, error, isError, refetch, isRefetching } = useQuery(
+		{
+			queryKey: queryKeys.tags(params),
+			queryFn: () => getTags(params)
+		}
+	)
 
-	return { data, isLoading }
+	return { data, isLoading, error, isError, refetch, isRefetching }
 }

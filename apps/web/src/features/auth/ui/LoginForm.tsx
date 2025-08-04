@@ -35,7 +35,7 @@ export const LoginForm = () => {
 	const onSubmit = (data: AuthSchemaType) => {
 		signInMutation(data, {
 			onSuccess: response => {
-				setUser(response.data.user)
+				setUser(response.data)
 			}
 		})
 	}

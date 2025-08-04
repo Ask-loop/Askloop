@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { ROUTES, PUBLIC_ROUTES_VALUES } from './constants'
+import { ROUTES, PROTECTED_ROUTES_VALUES } from './constants'
 import { Cookies } from './constants/cookies'
 
 export function middleware(request: NextRequest) {
@@ -8,13 +8,11 @@ export function middleware(request: NextRequest) {
 	const accessToken = request.cookies.get(Cookies.USER)?.value
 
 	const url = request.nextUrl.clone()
-	const isPublicPage = PUBLIC_ROUTES_VALUES.some(
-		route =>
-			pathname.startsWith(route) ||
-			PUBLIC_ROUTES_VALUES.includes(pathname)
+	const isProtectedPage = PROTECTED_ROUTES_VALUES.some(
+		route => pathname.startsWith(route) || route === pathname
 	)
 
-	if (!accessToken && !isPublicPage) {
+	if (!accessToken && isProtectedPage) {
 		url.pathname = ROUTES.signIn
 
 		return NextResponse.redirect(url)

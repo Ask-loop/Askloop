@@ -25,13 +25,13 @@ export const MarkdownParser = ({
 		<div
 			data-color-mode={theme}
 			className={cn(
-				'prose dark:prose-invert max-w-[80ch] break-words',
+				'prose dark:prose-invert max-w-[80ch] bg-transparent break-words',
 				className
 			)}
 		>
 			<MarkdownPreview
 				remarkPlugins={[remarkGfm]}
-				className='text-sm sm:text-base'
+				className='!bg-transparent text-sm sm:text-base'
 				source={markdown}
 			/>
 		</div>

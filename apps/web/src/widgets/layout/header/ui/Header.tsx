@@ -20,7 +20,7 @@ export const Header = () => {
 	)
 
 	return (
-		<header className='dark:bg-primary-dark sticky top-0 z-10 h-16 border-b bg-white'>
+		<header className='bg-card sticky top-0 z-10 h-16 border-b'>
 			<Container className='flex h-full items-center justify-between'>
 				<div className='flex items-center gap-4'>
 					<AskLoopLogo />

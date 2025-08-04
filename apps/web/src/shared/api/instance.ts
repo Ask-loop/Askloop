@@ -78,9 +78,8 @@ class Instance {
 		const isAuthError =
 			error.response?.status === 401 || error.response?.status === 403
 		const isNotRetried = !request._retry
-		const isNotSignOut = request.url !== AuthEndpoints.SignOut
 
-		return isAuthError && isNotRetried && isNotSignOut
+		return isAuthError && isNotRetried
 	}
 
 	private async queueRequest(

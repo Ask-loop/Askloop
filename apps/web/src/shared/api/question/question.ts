@@ -1,3 +1,4 @@
+import qs from 'qs'
 import { AskQuestionInput } from '@/features/question-ask/model'
 import { axiosInstance } from '@/shared/api'
 import { GetTagsReq, GetTagsResponse } from '@/shared/types'
@@ -13,7 +14,11 @@ import {
 export const getQuestions = async (params: GetQuestionsReq) => {
 	const response = await axiosInstance.get<ApiResponse<GetQuestionsResponse>>(
 		QuestionsEndpoints.Questions,
-		{ params }
+		{
+			params,
+			paramsSerializer: params =>
+				qs.stringify(params, { arrayFormat: 'repeat' })
+		}
 	)
 
 	return response.data

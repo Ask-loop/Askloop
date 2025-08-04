@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/shared/api'
-import { GetQuestionsReq } from '@/shared/types/question'
 import { GetTagsReq } from '@/shared/types/tag'
+import { GetQuestionsReq } from '../api/question'
 
 export const useInvalidateQueries = () => {
 	const queryClient = useQueryClient()

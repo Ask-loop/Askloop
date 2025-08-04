@@ -32,24 +32,58 @@ export class TagsService {
     return tag;
   }
 
-  async findOrCreateTags(names: string[], userId: number): Promise<Tag[]> {
+  async findOrCreateTags(inputs: string[], userId: number): Promise<Tag[]> {
     const user = await this.usersService.findById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const existingTags = await Tag.find({ where: { name: In(names) } });
-    const existingTagNames = existingTags.map(tag => tag.name);
+    const tagsMap = new Map<number, Tag>();
+    const nameMap = new Map<string, Tag>();
 
-    const newTagNames = names.filter(name => !existingTagNames.includes(name));
+    for (const input of inputs) {
+      let tag: Tag | null = null;
 
-    const newTags = await Promise.all(newTagNames.map(name => Tag.create({ name, description: '', user }).save()));
+      const isId = typeof input === 'number' || /^\d+$/.test(String(input));
+      const name = input.toString().toLowerCase();
 
-    if (!newTags) {
-      throw new InternalServerErrorException('Failed to create tags');
+      // 1. Try to find by ID if input is a number
+      if (isId) {
+        const id = Number(input);
+        if (tagsMap.has(id)) {
+          tag = tagsMap.get(id)!;
+        } else {
+          tag = await Tag.findOne({ where: { id } });
+          if (tag) tagsMap.set(id, tag);
+        }
+      }
+
+      // 2. Try to find by name if not found by ID
+      if (!tag) {
+        if (nameMap.has(name)) {
+          tag = nameMap.get(name)!;
+        } else {
+          tag = await Tag.findOne({ where: { name } });
+          if (tag) nameMap.set(name, tag);
+        }
+      }
+
+      // 3. Create new tag if not found
+      if (!tag) {
+        tag = Tag.create({ name, user, description: '' });
+        await tag.save();
+      } else {
+        tag.usageCount = (tag.usageCount || 0) + 1;
+        await tag.save();
+      }
+
+      // Prevent duplicates
+      if (!tagsMap.has(tag.id)) {
+        tagsMap.set(tag.id, tag);
+      }
     }
 
-    return [...existingTags, ...newTags];
+    return Array.from(tagsMap.values());
   }
 
   async findTagById(id: number): Promise<Tag> {

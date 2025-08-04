@@ -13,6 +13,8 @@ export type Question = {
 	user: User
 	views: number
 	answersCount: number
+	score: number
+	viewed: boolean
 }
 
 export type GetQuestionsResponse = {
@@ -21,8 +23,16 @@ export type GetQuestionsResponse = {
 }
 
 export const enum QuestionSortBy {
-	CreatedAt = 'createdAt',
-	UpdatedAt = 'updatedAt'
+	NEWEST = 'createdAt',
+	UPDATED = 'updatedAt',
+
+	VIEWS = 'views',
+	ANSWERS = 'answersCount',
+	VOTES = 'votesCount',
+	TRENDING = 'trendingScore',
+
+	HOT = 'hotScore',
+	WEEK = 'weeklyScore'
 }
 
 export const enum QuestionOrderBy {

@@ -5,6 +5,7 @@ export type Tag = {
 	name: string
 	description?: string
 	createdAt: string
+	usageCount: number
 	updatedAt?: string
 }
 

@@ -1,3 +1,5 @@
+import { type ReactNode } from 'react'
+
 export type ApiResponse<T> = {
 	data: T
 	message?: string
@@ -9,7 +11,7 @@ export type Pagination = {
 	limit?: number
 }
 
-export type SortOption = {
-	label: string
-	value: string
-}
+export type SortOption<T = string> = {
+	label: ReactNode
+	value: T
+} & Record<string, any>

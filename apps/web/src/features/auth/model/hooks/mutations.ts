@@ -107,7 +107,7 @@ export const useLogout = () => {
 
 			signOut()
 
-			router.replace(ROUTES.signIn)
+			router.refresh()
 		},
 		onError: error => {
 			toastCatchError(error)

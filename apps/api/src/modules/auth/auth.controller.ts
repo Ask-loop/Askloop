@@ -21,8 +21,9 @@ export class AuthController {
     const user = await this.authService.signIn(authDto, res);
 
     const response = {
-      user,
+      data: user,
       success: true,
+      message: 'Signed in successfully',
     };
 
     return res.json(response);
@@ -39,9 +40,9 @@ export class AuthController {
   @Message('Email verified successfully')
   @HttpCode(200)
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto, @Res() res: Response) {
-    await this.authService.verifyEmail(verifyEmailDto.verificationToken, res);
+    const user = await this.authService.verifyEmail(verifyEmailDto.verificationToken, res);
 
-    return res.json({ message: 'Email verified successfully' });
+    return res.json({ message: 'Email verified successfully', success: true, data: user });
   }
 
   @Post('sign-out')
@@ -49,7 +50,7 @@ export class AuthController {
   async signOut(@Res() res: Response, @Req() req: Request) {
     await this.authService.signOut(res, req.user.id);
 
-    return res.json({ message: 'Signed out successfully' });
+    return res.json({ message: 'Signed out successfully', success: true, data: null });
   }
 
   @Post('refresh-tokens')

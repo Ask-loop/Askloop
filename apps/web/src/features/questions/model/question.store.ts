@@ -1,41 +1,39 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { QuestionOrderBy } from '@/entities/questions/model/types'
+import { QuestionSortBy } from '@/shared/api/question'
+import { SortOption } from '@/shared/types'
 
 type QuestionState = {
-	searchQuery: string
-	orderBy: QuestionOrderBy
-	tags: string[]
+	selectedTags: SortOption<number>[]
+	sortBy: QuestionSortBy
 	page: number
 	limit: number
 }
 
 type QuestionActions = {
-	setSearchQuery: (searchQuery: string) => void
-	setOrderBy: (orderBy: QuestionOrderBy) => void
-	setTags: (tags: string[]) => void
+	setSelectedTags: (tags: SortOption<number>[]) => void
 	setPage: (page: number) => void
 	setLimit: (limit: number) => void
+	setSortBy: (sortBy: QuestionSortBy) => void
 }
 
 export const useQuestionStore = create<QuestionState & QuestionActions>()(
 	persist(
 		set => ({
-			searchQuery: '',
-			orderBy: QuestionOrderBy.NEWEST,
-			tags: [],
+			selectedTags: [],
 			page: 1,
 			limit: 10,
-			setSearchQuery: (searchQuery: string) => set({ searchQuery }),
-			setOrderBy: (orderBy: QuestionOrderBy) => set({ orderBy }),
-			setTags: (tags: string[]) => set({ tags }),
-			setPage: (page: number) => set({ page }),
-			setLimit: (limit: number) => set({ limit })
+			sortBy: QuestionSortBy.NEWEST,
+			setSortBy: sortBy => set({ sortBy }),
+			setSelectedTags: tags => set({ selectedTags: tags }),
+			setPage: page => set({ page }),
+			setLimit: limit => set({ limit })
 		}),
 		{
 			name: 'questionStore',
 			partialize: state => ({
-				orderBy: state.orderBy,
+				selectedTags: state.selectedTags,
+				sortBy: state.sortBy,
 				page: state.page,
 				limit: state.limit
 			})

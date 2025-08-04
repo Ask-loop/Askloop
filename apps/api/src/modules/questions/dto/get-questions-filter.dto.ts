@@ -1,41 +1,40 @@
-import { IsOptional, IsString, IsEnum, IsNumber, IsArray } from 'class-validator';
+import { IsOptional, IsString, IsEnum, IsNumber, IsArray, IsBoolean } from 'class-validator';
 import { PaginationOptions } from '@common/dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export enum SortBy {
-  CREATED_AT = 'createdAt',
-  UPDATED_AT = 'updatedAt',
+  NEWEST = 'createdAt',
+  UPDATED = 'updatedAt',
+
+  VIEWS = 'views',
+  ANSWERS = 'answersCount',
+  VOTES = 'votesCount',
+  TRENDING = 'trendingScore',
+
+  HOT = 'hotScore',
+  WEEK = 'weeklyScore',
 }
 
-export enum OrderBy {
-  NEWEST = 'NEWEST',
-  OLDEST = 'OLDEST',
+export enum OrderDirection {
+  ASC = 'ASC',
+  DESC = 'DESC',
 }
 
 export class GetQuestionsFilterDto extends PaginationOptions {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  search?: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
   userId?: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: [Number] })
   @IsOptional()
+  @Transform(({ value }) => (Array.isArray(value) ? value.map(Number) : [Number(value)]))
   @IsArray()
-  @IsNumber({}, { each: true })
   tagIds?: number[];
 
   @ApiPropertyOptional({ enum: SortBy })
   @IsOptional()
   @IsEnum(SortBy)
-  sortBy?: SortBy = SortBy.CREATED_AT;
-
-  @ApiPropertyOptional({ enum: OrderBy })
-  @IsOptional()
-  @IsEnum(OrderBy)
-  orderBy?: OrderBy = OrderBy.NEWEST;
+  sortBy?: SortBy = SortBy.NEWEST;
 }

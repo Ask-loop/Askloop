@@ -14,10 +14,9 @@ export class CreateQuestionDto {
   @MinLength(20)
   body: string;
 
-  // can be string[]
   @ApiProperty()
   @IsNotEmpty()
   @IsArray()
   @IsString({ each: true })
-  tagIds: string[] | number[];
+  tagIds: string[];
 }

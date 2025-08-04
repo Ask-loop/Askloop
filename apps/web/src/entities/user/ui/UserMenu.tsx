@@ -56,7 +56,10 @@ export const UserMenu = () => {
 				<UserAvatar src={user?.picture} fallback={fallback} />
 			</DropdownMenuTrigger>
 
-			<DropdownMenuContent className='p-2 shadow-none' align='center'>
+			<DropdownMenuContent
+				className='!w-full !max-w-[300px] p-2 shadow-none'
+				align='center'
+			>
 				<DropdownMenuGroup className='space-y-2'>
 					<DropdownMenuItem
 						asChild
@@ -71,7 +74,7 @@ export const UserMenu = () => {
 
 							<div className='flex flex-col'>
 								<p className='text-sm font-medium'>
-									{user?.email}
+									{user?.displayName}
 								</p>
 								<p className='text-muted-foreground text-sm'>
 									Profile

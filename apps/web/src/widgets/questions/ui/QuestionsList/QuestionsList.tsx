@@ -1,38 +1,59 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { HelpCircle, Plus } from 'lucide-react'
-import Link from 'next/link'
+import { X } from 'lucide-react'
+import { useMemo } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { useGetQuestions } from '@/features/questions/hooks/queries'
 import { useQuestionStore } from '@/features/questions/model'
-import { Button } from '@/shared/shadcn/ui/button'
+import { QuestionSort } from '@/features/questions/ui/QuestionSort'
+import { Badge } from '@/shared/shadcn/ui'
+import { SortOption, Tag } from '@/shared/types'
 import { Pagination } from '@/shared/ui/Pagination/Pagination'
-import { ROUTES } from '@/constants'
-import { QuestionCard, QuestionCardSkeleton } from '@/entities/questions'
+import { QuestionContainer } from './QuestionContainer'
 
 export const QuestionsList = () => {
-	const { page, limit, searchQuery, orderBy, setPage, setLimit } =
-		useQuestionStore(
-			useShallow(state => ({
-				page: state.page,
-				limit: state.limit,
-				searchQuery: state.searchQuery,
-				orderBy: state.orderBy,
-				setPage: state.setPage,
-				setLimit: state.setLimit
-			}))
-		)
+	const {
+		page,
+		limit,
+		selectedTags,
+		setPage,
+		setLimit,
+		setSelectedTags,
+		sortBy
+	} = useQuestionStore(
+		useShallow(state => ({
+			page: state.page,
+			limit: state.limit,
+			selectedTags: state.selectedTags,
+			sortBy: state.sortBy,
+			setSortBy: state.setSortBy,
+			setPage: state.setPage,
+			setLimit: state.setLimit,
+			setSelectedTags: state.setSelectedTags
+		}))
+	)
+
+	const selectedTagIds = useMemo(
+		() => selectedTags.map(t => t.value),
+		[selectedTags]
+	)
 
 	const { data, isLoading } = useGetQuestions({
 		page,
 		limit,
-		search: searchQuery,
-		orderBy
+		tagIds: selectedTagIds.length > 0 ? selectedTagIds : undefined,
+		sortBy
 	})
 
-	const handleTagClick = () => {
-		console.log('handleTagClick')
+	const handleTagClick = (tag: Tag) => {
+		if (!selectedTagIds.includes(tag.id)) {
+			setSelectedTags([
+				...selectedTags,
+				{ label: tag.name, value: tag.id }
+			])
+			setPage(1)
+		}
 	}
 
 	const handlePaginationChange = (page: number, limit: number) => {
@@ -40,73 +61,55 @@ export const QuestionsList = () => {
 		setLimit(limit)
 	}
 
-	if (isLoading) {
-		return (
-			<div className='grid gap-4 sm:gap-6'>
-				{Array.from({ length: limit }).map((_, index) => (
-					<QuestionCardSkeleton key={index} />
-				))}
-			</div>
-		)
-	}
-
-	if (!data?.questions?.length) {
-		return (
-			<motion.div
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				className='bg-card flex flex-col items-center justify-center space-y-4 rounded-lg border p-6 text-center sm:p-8'
-			>
-				<HelpCircle className='text-muted-foreground h-10 w-10 sm:h-12 sm:w-12' />
-				<h3 className='text-base font-medium sm:text-lg'>
-					No questions found
-				</h3>
-				<p className='text-muted-foreground text-sm'>
-					Be the first to ask a question!
-				</p>
-				<Button className='mt-4' asChild>
-					<Link href={ROUTES.ask}>
-						<Plus className='mr-2 h-4 w-4' />
-						Ask a Question
-					</Link>
-				</Button>
-			</motion.div>
-		)
+	const handleTagRemove = (option: SortOption<number>) => {
+		setSelectedTags(selectedTags.filter(tag => tag.value !== option.value))
 	}
 
 	return (
-		<div className='grid gap-4 sm:gap-6'>
+		<div className='grid gap-2 py-5 sm:gap-3'>
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ delay: 0.1 }}
-				className='mb-4'
+				className='flex items-center justify-between'
 			>
-				<div className='text-muted-foreground text-sm'>
-					Showing {data?.questions?.length} of {data?.total} questions
-				</div>
+				<span className='text-muted-foreground text-sm'>
+					Showing {data?.questions?.length || 0} of {data?.total || 0}{' '}
+					questions
+				</span>
+
+				<QuestionSort />
 			</motion.div>
 
-			<motion.div
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				transition={{ delay: 0.2 }}
-				className='grid gap-4 sm:gap-6'
-			>
-				{data?.questions?.map((question, index) => (
-					<motion.div
-						key={question.id}
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: index * 0.1 }}
-					>
-						<QuestionCard
-							question={question}
-							onTagClick={handleTagClick}
-						/>
-					</motion.div>
-				))}
-			</motion.div>
+			{!!selectedTags.length && (
+				<div className='mb-2 flex flex-col gap-2 sm:flex-row sm:items-center'>
+					<span className='text-muted-foreground text-sm whitespace-nowrap'>
+						Tagged with:
+					</span>
+					<div className='flex flex-wrap gap-2'>
+						{selectedTags.map(tag => (
+							<Badge
+								variant='secondary'
+								key={tag.value}
+								className={
+									'hover:bg-secondary/80 flex cursor-pointer items-center gap-1 text-xs transition-colors'
+								}
+								onClick={handleTagRemove.bind(null, tag)}
+							>
+								{tag.label}
+								<X size={12} />
+							</Badge>
+						))}
+					</div>
+				</div>
+			)}
+
+			<QuestionContainer
+				questions={data?.questions}
+				selectedTagIds={selectedTagIds}
+				onTagClick={handleTagClick}
+				isLoading={isLoading}
+			/>
 
 			<Pagination
 				currentPage={page}

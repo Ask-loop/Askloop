@@ -65,9 +65,12 @@ export class Question extends BaseEntity {
     return this.votes?.filter(v => v.vote === VoteType.Down).length || 0;
   }
 
-  get score(): number {
-    return this.upvotes - this.downvotes;
-  }
+  // get score(): number {
+  //   return this.upvotes - this.downvotes;
+  // }
+
+  @Column({ default: 0 })
+  score: number;
 
   @CreateDateColumn()
   createdAt: Date;

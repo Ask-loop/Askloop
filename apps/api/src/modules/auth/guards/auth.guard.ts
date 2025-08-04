@@ -22,31 +22,20 @@ export class AuthGuard implements CanActivate {
 
     if (!userCookie?.accessToken) return false;
 
-    try {
-      const userId = await this.tokensService.decodeAccessToken(userCookie.accessToken);
+    const userId = await this.tokensService.decodeAccessToken(userCookie.accessToken);
 
-      const isBlacklisted = await this.tokensService.isAccessTokenBlacklisted(userId, userCookie.accessToken);
+    const isBlacklisted = await this.tokensService.isAccessTokenBlacklisted(userId, userCookie.accessToken);
 
-      if (isBlacklisted) {
-        throw new UnauthorizedException('Token has been revoked. Please sign in again.');
-      }
-
-      const user = await this.usersService.findById(userId);
-
-      if (!user) return false;
-
-      request.user = user;
-
-      return true;
-    } catch (error) {
-      if (error instanceof TokenExpiredError) {
-        throw new UnauthorizedException('Token expired. Please sign in again.');
-      }
-      if (error instanceof JsonWebTokenError) {
-        throw new UnauthorizedException('Invalid token. Please sign in again.');
-      }
-
-      throw new UnauthorizedException('Invalid token. Please sign in again.');
+    if (isBlacklisted) {
+      throw new UnauthorizedException('Token has been revoked. Please sign in again.');
     }
+
+    const user = await this.usersService.findById(userId);
+
+    if (!user) return false;
+
+    request.user = user;
+
+    return true;
   }
 }

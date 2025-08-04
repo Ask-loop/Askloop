@@ -3,7 +3,7 @@ import { Skeleton } from '@/shared/shadcn/ui'
 
 export const QuestionCardSkeleton = () => {
 	return (
-		<motion.div className='space-y-4 rounded-sm border bg-white p-6'>
+		<motion.div className='bg-card space-y-4 rounded-sm border p-6'>
 			<Skeleton className='h-5 w-3/4' />
 			<Skeleton className='h-4 w-full' />
 			<div className='flex gap-2'>

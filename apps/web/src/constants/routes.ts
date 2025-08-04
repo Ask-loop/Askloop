@@ -10,14 +10,16 @@ export const PUBLIC_ROUTES = {
 	badges: '/badges',
 	leaderboard: '/leaderboard',
 	discussions: '/discussions',
-	search: '/search'
+	search: '/search',
+	userProfile: '/user/:id/:slug'
 }
 
 export const PROTECTED_ROUTES = {
 	create: '/create',
-	userProfile: '/user/:id/:slug',
 	settings: '/settings',
-	ask: '/ask'
+	ask: '/ask',
+	notifications: '/notifications',
+	profile: '/profile'
 }
 
 export const PUBLIC_ROUTES_VALUES = Object.values(PUBLIC_ROUTES)

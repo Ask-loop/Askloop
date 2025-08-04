@@ -18,8 +18,8 @@ export class QuestionsController {
   ) {}
 
   @Get()
-  getQuestions(@Query() filter: GetQuestionsFilterDto) {
-    return this.questionsService.getQuestions(filter);
+  getQuestions(@Query() filter: GetQuestionsFilterDto, @Req() req: Request) {
+    return this.questionsService.getQuestions(filter, req.ip || '');
   }
 
   @Get(':id')
@@ -59,5 +59,15 @@ export class QuestionsController {
   @Get(':id/answers')
   getAnswersByQuestion(@Param('id') id: string) {
     return this.questionsService.getAnswersByQuestion(Number(id));
+  }
+
+  @Get(':id/related')
+  getRelated(@Param('id', ParseIntPipe) id: number, @Query('limit') limit: number) {
+    return this.questionsService.getRelatedQuestions(id, limit);
+  }
+
+  @Get('similar')
+  getSimilar(@Query('value') value: string, @Query('limit') limit: number) {
+    return this.questionsService.searchSimilarQuestions(value, limit);
   }
 }
